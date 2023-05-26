@@ -1,12 +1,8 @@
 local hbac_config = require("hbac.setup").opts
 local state = require("hbac.state")
+local utils = require("hbac.utils")
 
 local entry_display = require("telescope.pickers.entry_display")
-local has_devicons, devicons = pcall(require, "nvim-web-devicons")
-local Path = require("plenary.path")
-
-local cwd = vim.loop.cwd()
-local os_home = vim.loop.os_homedir()
 
 local M = {}
 
@@ -21,25 +17,8 @@ M.display = function(entry)
 		return pin_icon, pin_icon_hl
 	end
 
-	local function get_devicon()
-		if not has_devicons then
-			return "", ""
-		end
-		return devicons.get_icon(bufname, string.match(bufname, "%a+$"), { default = true })
-	end
-
 	local function get_display_text()
-		local function format_filepath()
-			local path = vim.fn.fnamemodify(bufname, ":p:h")
-			if cwd and vim.startswith(path, cwd) then
-				path = string.sub(path, #cwd + 2)
-			elseif os_home and vim.startswith(path, os_home) then
-				path = "~/" .. Path:new(path):make_relative(os_home)
-			end
-			return path
-		end
-
-		local bufpath = format_filepath()
+		local bufpath = utils.format_filepath(bufname)
 		local display_filename = vim.fn.fnamemodify(bufname, ":t")
 		if bufpath == "" then
 			return display_filename
@@ -58,7 +37,7 @@ M.display = function(entry)
 
 	return displayer({
 		{ get_pin_icon() },
-		{ get_devicon() },
+		{ utils.get_devicon(bufname) },
 		get_display_text(),
 	})
 end
