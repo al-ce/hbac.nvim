@@ -75,6 +75,23 @@ M.store_pinned_bufs = function()
 	end
 	pin_storage[keyname] = storage_entry
 	pin_storage_file_path:write(vim.fn.json_encode(pin_storage), "w")
+	hbac_notify("Pin storage: '" .. keyname .. "' stored", "info")
+end
+
+M.remove_pin_storage_entry = function(keyname)
+	local pin_storage = get_pin_storage() or {}
+	local keynames = vim.tbl_keys(pin_storage)
+	if #keynames == 0 then
+		hbac_notify("No pin storage entries to remove", "warn")
+		return
+	end
+	if not pin_storage[keyname] then
+		hbac_notify("No pin storage entry with that name", "warn")
+		return
+	end
+	pin_storage[keyname] = nil
+	pin_storage_file_path:write(vim.fn.json_encode(pin_storage), "w")
+	hbac_notify("Pin storage: '" .. keyname .. "' removed", "info")
 end
 
 return M
