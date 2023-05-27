@@ -1,0 +1,80 @@
+local state = require("hbac.state")
+local utils = require("hbac.utils")
+local hbac_notify = require("hbac.utils").hbac_notify
+
+local Path = require("plenary.path")
+local data_dir = vim.fn.stdpath("data")
+local pin_storage_file_path = Path:new(data_dir, "pin_storage.json")
+
+local M = {}
+
+local get_pin_storage = function()
+	if not pin_storage_file_path:exists() then
+		return {}
+	end
+	local content = pin_storage_file_path:read()
+	return vim.fn.json_decode(content)
+end
+
+local function get_pinned_bufnrs()
+	return vim.tbl_filter(function(bufnr)
+		return state.pinned_buffers[bufnr]
+	end, utils.get_listed_buffers())
+end
+
+local function make_pinned_bufs_data(pinned_bufnrs)
+	local pinned_bufs_data = {}
+	for _, bufnr in ipairs(pinned_bufnrs) do
+		local bufname = vim.fn.bufname(bufnr)
+		local filepath = utils.format_filepath(bufname)
+		local filename = vim.fn.fnamemodify(bufname, ":t")
+		table.insert(pinned_bufs_data, {
+			filename = filename,
+			filepath = filepath,
+		})
+	end
+	return pinned_bufs_data
+end
+
+local function create_storage_entry(pinned_bufs_data)
+	local keyname = vim.fn.input("Hbac Pin Storage\nEntry name (leave blank to use timestamp): ")
+	local timestamp = os.date("%Y-%m-%d %H:%M:%S")
+	keyname = keyname == "" and tostring(timestamp) or keyname
+	local cwd = vim.fn.getcwd() or vim.fn.expand("%:p:h")
+	local proj_root = cwd:gsub(vim.env.HOME, "~")
+	return keyname, {
+		proj_root = proj_root,
+		stored_pins = pinned_bufs_data,
+		timestamp = timestamp,
+	}
+end
+
+local function confirm_duplicate_overwrite(pin_storage, keyname)
+	if not pin_storage[keyname] then
+		return true
+	end
+	local msg = "Hbac Pin Storage\nEntry with name '%s' already exists. Overwrite? (y/n): "
+	local overwrite = vim.fn.input(string.format(msg, keyname))
+	if overwrite == "y" then
+		return true
+	end
+	hbac_notify("Pin storage cancelled", "warn")
+end
+
+M.store_pinned_bufs = function()
+	local pinned_bufnrs = get_pinned_bufnrs()
+	if #pinned_bufnrs == 0 then
+		hbac_notify("No pins to store", "warn")
+		return nil
+	end
+	local pinned_bufs_data = make_pinned_bufs_data(pinned_bufnrs)
+	local pin_storage = get_pin_storage()
+	local keyname, storage_entry = create_storage_entry(pinned_bufs_data)
+	if not confirm_duplicate_overwrite(pin_storage, keyname) then
+		return
+	end
+	pin_storage[keyname] = storage_entry
+	pin_storage_file_path:write(vim.fn.json_encode(pin_storage), "w")
+end
+
+return M
