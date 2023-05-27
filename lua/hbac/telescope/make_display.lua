@@ -1,6 +1,6 @@
 local hbac_config = require("hbac.setup").opts
 local state = require("hbac.state")
-local utils = require("hbac.utils")
+local hbac_telescope_utils = require("hbac.telescope.telescope_utils")
 
 local entry_display = require("telescope.pickers.entry_display")
 
@@ -18,7 +18,7 @@ M.display = function(entry)
 	end
 
 	local function get_display_text()
-		local bufpath = utils.format_filepath(bufname)
+		local bufpath = hbac_telescope_utils.format_filepath(bufname)
 		local display_filename = vim.fn.fnamemodify(bufname, ":t")
 		if bufpath == "" then
 			return display_filename
@@ -37,7 +37,7 @@ M.display = function(entry)
 
 	return displayer({
 		{ get_pin_icon() },
-		{ utils.get_devicon(bufname) },
+		{ hbac_telescope_utils.get_devicon(bufname) },
 		get_display_text(),
 	})
 end

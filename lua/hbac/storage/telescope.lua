@@ -19,6 +19,10 @@ M.stored_pins_picker = function(opts)
 				local hbac_storage_actions = require("hbac.storage.actions")
 				map("i", "<CR>", hbac_storage_actions.hbac_open_stored_pins)
 				map("n", "<CR>", hbac_storage_actions.hbac_open_stored_pins)
+
+				map("i", "<M-x>", hbac_storage_actions.hbac_remove_stored_pins)
+				map("n", "<M-x>", hbac_storage_actions.hbac_remove_stored_pins)
+
 				return true
 			end,
 		})

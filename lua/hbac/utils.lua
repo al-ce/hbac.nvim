@@ -1,6 +1,3 @@
-local Path = require("plenary.path")
-local cwd = vim.loop.cwd()
-local os_home = vim.loop.os_homedir()
 local state = require("hbac.state")
 
 local M = {}
@@ -16,24 +13,6 @@ M.buf_autoclosable = function(bufnr)
 		return false
 	end
 	return true
-end
-
-M.format_filepath = function(bufname)
-	local path = vim.fn.fnamemodify(bufname, ":p:h")
-	if cwd and vim.startswith(path, cwd) then
-		path = string.sub(path, #cwd + 2)
-	elseif os_home and vim.startswith(path, os_home) then
-		path = "~/" .. Path:new(path):make_relative(os_home)
-	end
-	return path
-end
-
-M.get_devicon = function(bufname)
-	local has_devicons, devicons = pcall(require, "nvim-web-devicons")
-	if not has_devicons then
-		return "", ""
-	end
-	return devicons.get_icon(bufname, string.match(bufname, "%a+$"), { default = true })
 end
 
 M.get_listed_buffers = function()

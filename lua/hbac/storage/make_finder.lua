@@ -25,7 +25,7 @@ M.make_finder = function()
 		entry_maker = function(entry)
 			local pin_session = pin_storage[entry]
 			return {
-				value = pin_session,
+				value = entry,
 				display = function()
 					local pin_count = get_pin_count(pin_session)
 					local proj_root = pin_session["proj_root"]
@@ -37,6 +37,8 @@ M.make_finder = function()
 				end,
 				-- TODO: sort by timestamp
 				ordinal = entry,
+				stored_pins = pin_session.stored_pins,
+				timestamp = pin_session.timestamp,
 			}
 		end,
 	})

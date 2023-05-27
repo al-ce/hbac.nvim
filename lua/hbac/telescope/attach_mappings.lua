@@ -1,50 +1,32 @@
-local action_state = require("telescope.actions.state")
-
 local hbac_config = require("hbac.setup").opts
 local state = require("hbac.state")
 local subcommands = require("hbac.command.subcommands")
-local utils = require("hbac.utils")
-local make_finder = require("hbac.telescope.make_finder").make_finder
+local hbac_telescope_utils = require("hbac.telescope.telescope_utils")
+
+local action_state = require("telescope.actions.state")
 
 local M = {}
 
-local function execute_telescope_action(prompt_bufnr, action)
+local function pin_picker_action(prompt_bufnr, action)
 	local picker = action_state.get_current_picker(prompt_bufnr)
-	local multi_selection = picker:get_multi_selection()
-
-	local notify = hbac_config.notify
-	utils.set_notify(false)
-	if next(multi_selection) then
-		for _, entry in ipairs(multi_selection) do
-			action(entry.value)
-		end
-	else
-		local single_selection = action_state.get_selected_entry()
-		action(single_selection.value)
-	end
-	utils.set_notify(notify)
-
-	local row = picker:get_selection_row()
-	picker:register_completion_callback(function()
-		picker:set_selection(row)
-	end)
-	picker:refresh(make_finder(), { reset_prompt = false })
+	hbac_telescope_utils.execute_telescope_action(picker, action)
+	hbac_telescope_utils.refresh_picker(picker)
 end
 
 local function hbac_toggle_selections(prompt_bufnr)
-	execute_telescope_action(prompt_bufnr, state.toggle_pin)
+	pin_picker_action(prompt_bufnr, state.toggle_pin)
 end
 local function hbac_pin_all(prompt_bufnr)
-	execute_telescope_action(prompt_bufnr, subcommands.pin_all)
+	pin_picker_action(prompt_bufnr, subcommands.pin_all)
 end
 local function hbac_unpin_all(prompt_bufnr)
-	execute_telescope_action(prompt_bufnr, subcommands.unpin_all)
+	pin_picker_action(prompt_bufnr, subcommands.unpin_all)
 end
 local function hbac_close_unpinned(prompt_bufnr)
-	execute_telescope_action(prompt_bufnr, subcommands.close_unpinned)
+	pin_picker_action(prompt_bufnr, subcommands.close_unpinned)
 end
 local function hbac_delete_buffer(prompt_bufnr)
-	execute_telescope_action(prompt_bufnr, hbac_config.close_command)
+	pin_picker_action(prompt_bufnr, hbac_config.close_command)
 end
 
 M.attach_mappings = function(_, map)

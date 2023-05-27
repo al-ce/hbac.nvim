@@ -1,6 +1,7 @@
 local state = require("hbac.state")
 local hbac_config = require("hbac.setup").opts
 local utils = require("hbac.utils")
+local hbac_telescope_utils = require("hbac.telescope.telescope_utils")
 local hbac_notify = require("hbac.utils").hbac_notify
 
 local cwd = vim.fn.getcwd() or vim.fn.expand("%:p:h")
@@ -28,7 +29,7 @@ local function make_pinned_bufs_data(pinned_bufnrs)
 	local pinned_bufs_data = {}
 	for _, bufnr in ipairs(pinned_bufnrs) do
 		local bufname = vim.fn.bufname(bufnr)
-		local filepath = utils.format_filepath(bufname)
+		local filepath = hbac_telescope_utils.format_filepath(bufname)
 		local filename = vim.fn.fnamemodify(bufname, ":t")
 		local abs_path = vim.fn.fnamemodify(bufname, ":p")
 		table.insert(pinned_bufs_data, {
