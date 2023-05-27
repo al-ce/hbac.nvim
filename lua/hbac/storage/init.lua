@@ -10,7 +10,7 @@ local pin_storage_file_path = Path:new(data_dir, "pin_storage.json")
 
 local M = {}
 
-local get_pin_storage = function()
+M.get_pin_storage = function()
 	if not pin_storage_file_path:exists() then
 		return {}
 	end
@@ -71,7 +71,7 @@ M.store_pinned_bufs = function()
 		return nil
 	end
 	local pinned_bufs_data = make_pinned_bufs_data(pinned_bufnrs)
-	local pin_storage = get_pin_storage()
+	local pin_storage = M.get_pin_storage()
 	local keyname, storage_entry = create_storage_entry(pinned_bufs_data)
 	if not confirm_duplicate_overwrite(pin_storage, keyname) then
 		return
@@ -82,7 +82,7 @@ M.store_pinned_bufs = function()
 end
 
 M.remove_pin_storage_entry = function(keyname)
-	local pin_storage = get_pin_storage() or {}
+	local pin_storage = M.get_pin_storage() or {}
 	local keynames = vim.tbl_keys(pin_storage)
 	if #keynames == 0 then
 		hbac_notify("No pin storage entries to remove", "warn")
@@ -98,7 +98,7 @@ M.remove_pin_storage_entry = function(keyname)
 end
 
 M.open_pin_storage_entry = function(keyname)
-	local pin_storage = get_pin_storage() or {}
+	local pin_storage = M.get_pin_storage() or {}
 	if not pin_storage[keyname] then
 		hbac_notify("No pin storage entry with that name", "warn")
 		return
