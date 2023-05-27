@@ -23,14 +23,14 @@ M.pin_picker = function(opts)
 	local make_finder = require("hbac.telescope.make_finder").make_finder
 	opts = opts or {}
 	pickers
-			.new(opts, {
-				prompt_title = "Hbac Pin States",
-				finder = make_finder(),
-				sorter = telescope_conf.generic_sorter(opts),
-				attach_mappings = attach_mappings.attach_mappings,
-				previewer = telescope_conf.file_previewer(opts),
-			})
-			:find()
+		.new(opts, {
+			prompt_title = "Hbac Pin States",
+			finder = make_finder(),
+			sorter = telescope_conf.generic_sorter(opts),
+			attach_mappings = attach_mappings.attach_mappings,
+			previewer = telescope_conf.file_previewer(opts),
+		})
+		:find()
 end
 
 return M

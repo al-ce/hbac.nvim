@@ -45,8 +45,13 @@ end
 M.hbac_notify = function(message, level)
 	local config = require("hbac.setup").opts
 	if config.notify then
-		vim.notify(message, level, { title = "Hbac" })
+		vim.notify(message, level or "info", { title = "Hbac" })
 	end
+end
+
+M.set_notify = function(notify)
+	local config = require("hbac.setup").opts
+	config.notify = notify
 end
 
 return M

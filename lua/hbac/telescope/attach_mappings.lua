@@ -3,6 +3,7 @@ local action_state = require("telescope.actions.state")
 local hbac_config = require("hbac.setup").opts
 local state = require("hbac.state")
 local subcommands = require("hbac.command.subcommands")
+local utils = require("hbac.utils")
 local make_finder = require("hbac.telescope.make_finder").make_finder
 
 local M = {}
@@ -11,6 +12,8 @@ local function execute_telescope_action(prompt_bufnr, action)
 	local picker = action_state.get_current_picker(prompt_bufnr)
 	local multi_selection = picker:get_multi_selection()
 
+	local notify = hbac_config.notify
+	utils.set_notify(false)
 	if next(multi_selection) then
 		for _, entry in ipairs(multi_selection) do
 			action(entry.value)
@@ -19,6 +22,7 @@ local function execute_telescope_action(prompt_bufnr, action)
 		local single_selection = action_state.get_selected_entry()
 		action(single_selection.value)
 	end
+	utils.set_notify(notify)
 
 	local row = picker:get_selection_row()
 	picker:register_completion_callback(function()
