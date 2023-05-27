@@ -9,6 +9,17 @@ local M = {
 			vim.api.nvim_buf_delete(bufnr, {})
 		end,
 		notify = true,
+		storage = {
+			open = {
+				prehook = function()
+					-- local close_unpinned = require("hbac.command.subcommands").close_unpinned
+					-- close_unpinned()
+					-- vim.cmd("tabnew")
+				end,
+				posthook = function()
+				end,
+			},
+		},
 		telescope = {
 			mappings = {
 				n = {

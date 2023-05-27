@@ -1,7 +1,9 @@
 local state = require("hbac.state")
+local hbac_config = require("hbac.setup").opts
 local utils = require("hbac.utils")
 local hbac_notify = require("hbac.utils").hbac_notify
 
+local cwd = vim.fn.getcwd() or vim.fn.expand("%:p:h")
 local Path = require("plenary.path")
 local data_dir = vim.fn.stdpath("data")
 local pin_storage_file_path = Path:new(data_dir, "pin_storage.json")
@@ -28,7 +30,9 @@ local function make_pinned_bufs_data(pinned_bufnrs)
 		local bufname = vim.fn.bufname(bufnr)
 		local filepath = utils.format_filepath(bufname)
 		local filename = vim.fn.fnamemodify(bufname, ":t")
+		local abs_path = vim.fn.fnamemodify(bufname, ":p")
 		table.insert(pinned_bufs_data, {
+			abs_path = abs_path,
 			filename = filename,
 			filepath = filepath,
 		})
@@ -40,7 +44,6 @@ local function create_storage_entry(pinned_bufs_data)
 	local keyname = vim.fn.input("Hbac Pin Storage\nEntry name (leave blank to use timestamp): ")
 	local timestamp = os.date("%Y-%m-%d %H:%M:%S")
 	keyname = keyname == "" and tostring(timestamp) or keyname
-	local cwd = vim.fn.getcwd() or vim.fn.expand("%:p:h")
 	local proj_root = cwd:gsub(vim.env.HOME, "~")
 	return keyname, {
 		proj_root = proj_root,
@@ -75,7 +78,7 @@ M.store_pinned_bufs = function()
 	end
 	pin_storage[keyname] = storage_entry
 	pin_storage_file_path:write(vim.fn.json_encode(pin_storage), "w")
-	hbac_notify("Pin storage: '" .. keyname .. "' stored", "info")
+	hbac_notify("Pin storage: '" .. keyname .. "' stored")
 end
 
 M.remove_pin_storage_entry = function(keyname)
@@ -91,7 +94,25 @@ M.remove_pin_storage_entry = function(keyname)
 	end
 	pin_storage[keyname] = nil
 	pin_storage_file_path:write(vim.fn.json_encode(pin_storage), "w")
-	hbac_notify("Pin storage: '" .. keyname .. "' removed", "info")
+	hbac_notify("Pin storage: '" .. keyname .. "' removed")
+end
+
+M.open_pin_storage_entry = function(keyname)
+	local pin_storage = get_pin_storage() or {}
+	if not pin_storage[keyname] then
+		hbac_notify("No pin storage entry with that name", "warn")
+		return
+	end
+	hbac_config.storage.open.prehook()
+	local entry = pin_storage[keyname]
+	local stored_pins = entry.stored_pins
+	for _, pin in pairs(stored_pins) do
+		vim.cmd("silent! e " .. pin.abs_path)
+		local bufnr = vim.fn.bufnr()
+		state.pinned_buffers[bufnr] = true
+	end
+	hbac_config.storage.open.posthook()
+	hbac_notify("Pin storage: '" .. keyname .. "' opened")
 end
 
 return M
