@@ -47,6 +47,7 @@ require("hbac").setup({
     vim.api.nvim_buf_delete(bufnr, {})
   end,
   close_buffers_with_windows = false, -- hbac will close buffers with associated windows if this option is `true`
+  notify = true, -- whether to display notifications after an Hbac command
   telescope = {
     mappings = {
       n = {

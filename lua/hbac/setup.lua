@@ -8,6 +8,7 @@ local M = {
 		close_command = function(bufnr)
 			vim.api.nvim_buf_delete(bufnr, {})
 		end,
+		notify = true,
 		telescope = {
 			mappings = {
 				n = {

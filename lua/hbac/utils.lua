@@ -42,4 +42,11 @@ M.get_listed_buffers = function()
 	end, vim.api.nvim_list_bufs())
 end
 
+M.hbac_notify = function(message, level)
+	local config = require("hbac.setup").opts
+	if config.notify then
+		vim.notify(message, level, { title = "Hbac" })
+	end
+end
+
 return M

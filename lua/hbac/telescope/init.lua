@@ -1,3 +1,5 @@
+local hbac_notify = require("hbac.utils").hbac_notify
+
 local missing = ""
 for _, dependency in ipairs({ "plenary", "telescope" }) do
 	if not pcall(require, dependency) then
@@ -7,7 +9,7 @@ end
 
 if missing ~= "" then
 	local msg = "Missing dependencies:" .. missing
-	vim.notify(msg, "error", { title = "Hbac" })
+	hbac_notify(msg, "error")
 	return false
 end
 
@@ -21,14 +23,14 @@ M.pin_picker = function(opts)
 	local make_finder = require("hbac.telescope.make_finder").make_finder
 	opts = opts or {}
 	pickers
-		.new(opts, {
-			prompt_title = "Hbac Pin States",
-			finder = make_finder(),
-			sorter = telescope_conf.generic_sorter(opts),
-			attach_mappings = attach_mappings.attach_mappings,
-			previewer = telescope_conf.file_previewer(opts),
-		})
-		:find()
+			.new(opts, {
+				prompt_title = "Hbac Pin States",
+				finder = make_finder(),
+				sorter = telescope_conf.generic_sorter(opts),
+				attach_mappings = attach_mappings.attach_mappings,
+				previewer = telescope_conf.file_previewer(opts),
+			})
+			:find()
 end
 
 return M
