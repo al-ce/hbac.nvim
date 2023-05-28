@@ -54,6 +54,9 @@ M.previewer = function()
 			end
 		end,
 		teardown = function(self)
+			if self.state == nil then
+				return
+			end
 			vim.api.nvim_buf_delete(self.state.bufnr, { force = true })
 			self.state.bufnr = nil
 		end,
