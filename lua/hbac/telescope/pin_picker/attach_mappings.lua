@@ -8,9 +8,10 @@ local action_state = require("telescope.actions.state")
 local M = {}
 
 local function pin_picker_action(prompt_bufnr, action)
+	local make_finder = require("hbac.telescope.pin_picker.make_finder")
 	local picker = action_state.get_current_picker(prompt_bufnr)
 	hbac_telescope_utils.execute_telescope_action(picker, action)
-	hbac_telescope_utils.refresh_picker(picker)
+	hbac_telescope_utils.refresh_picker(picker, make_finder.make_finder)
 end
 
 local function hbac_toggle_selections(prompt_bufnr)
@@ -28,7 +29,6 @@ end
 local function hbac_delete_buffer(prompt_bufnr)
 	pin_picker_action(prompt_bufnr, hbac_config.close_command)
 end
-
 local function hbac_store_pinned_bufs(prompt_bufnr)
 	pin_picker_action(prompt_bufnr, subcommands.store_pinned_bufs)
 end
@@ -43,7 +43,7 @@ M.attach_mappings = function(_, map)
 		store_pinned_bufs = hbac_store_pinned_bufs,
 	}
 
-	for mode, hbac_cmds in pairs(hbac_config.telescope.mappings) do
+	for mode, hbac_cmds in pairs(hbac_config.telescope.pin_picker.mappings) do
 		for hbac_cmd, key in pairs(hbac_cmds) do
 			map(mode, key, hbac_telescope_actions[hbac_cmd])
 		end

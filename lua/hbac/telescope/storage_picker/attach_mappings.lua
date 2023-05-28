@@ -29,7 +29,7 @@ M.attach_mappings = function(_, map)
 		delete_stored_pins = hbac_delete_stored_pins,
 	}
 
-	for mode, hbac_cmds in pairs(hbac_config.storage.telescope_mappings) do
+	for mode, hbac_cmds in pairs(hbac_config.telescope.storage_picker.mappings) do
 		for hbac_cmd, key in pairs(hbac_cmds) do
 			map(mode, key, hbac_storage_picker_actions[hbac_cmd])
 		end

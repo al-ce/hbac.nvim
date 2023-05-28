@@ -18,39 +18,43 @@ local M = {
 				end,
 				posthook = function() end,
 			},
-			telescope_mappings = {
-				n = {
-					open_stored_pins = "<CR>",
-					delete_stored_pins = "<M-x>",
-				},
-				i = {
-					open_stored_pins = "<CR>",
-					delete_stored_pins = "<M-x>",
-				},
-			},
 		},
 		telescope = {
-			mappings = {
-				n = {
-					close_unpinned = "<M-c>",
-					delete_buffer = "<M-x>",
-					pin_all = "<M-a>",
-					unpin_all = "<M-u>",
-					toggle_selections = "<M-y>",
-					store_pinned_bufs = "<M-s>",
+			pin_picker = {
+				mappings = {
+					n = {
+						close_unpinned = "<M-c>",
+						delete_buffer = "<M-x>",
+						pin_all = "<M-a>",
+						unpin_all = "<M-u>",
+						toggle_selections = "<M-y>",
+						store_pinned_bufs = "<M-s>",
+					},
+					i = {
+						close_unpinned = "<M-c>",
+						delete_buffer = "<M-x>",
+						pin_all = "<M-a>",
+						unpin_all = "<M-u>",
+						toggle_selections = "<M-y>",
+						store_pinned_bufs = "<M-s>",
+					},
 				},
-				i = {
-					close_unpinned = "<M-c>",
-					delete_buffer = "<M-x>",
-					pin_all = "<M-a>",
-					unpin_all = "<M-u>",
-					toggle_selections = "<M-y>",
-					store_pinned_bufs = "<M-s>",
+				pin_icons = {
+					pinned = { "󰐃 ", hl = "DiagnosticOk" },
+					unpinned = { "󰤱 ", hl = "DiagnosticError" },
 				},
 			},
-			pin_icons = {
-				pinned = { "󰐃 ", hl = "DiagnosticOk" },
-				unpinned = { "󰤱 ", hl = "DiagnosticError" },
+			storage_picker = {
+				mappings = {
+					n = {
+						open_stored_pins = "<CR>",
+						delete_stored_pins = "<M-x>",
+					},
+					i = {
+						open_stored_pins = "<CR>",
+						delete_stored_pins = "<M-x>",
+					},
+				},
 			},
 		},
 	},

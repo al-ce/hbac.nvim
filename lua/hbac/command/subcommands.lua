@@ -51,17 +51,25 @@ M.toggle_autoclose = function()
 	hbac_notify("Autoclose " .. autoclose_state)
 end
 
-M.telescope = function(opts)
-	local hbac_telescope = require("hbac.telescope")
-	if not hbac_telescope then
+M.pin_picker = function(opts)
+	local pin_picker = require("hbac.telescope.pin_picker")
+	if not pin_picker then
 		return
 	end
-	hbac_telescope.pin_picker(opts)
+	pin_picker.pin_picker(opts)
 end
 
 M.store_pinned_bufs = function()
-	local storage = require("hbac.storage")
-	storage.store_pinned_bufs()
+	local store_pinned_bufs = require("hbac.storage").store_pinned_bufs
+	store_pinned_bufs()
+end
+
+M.storage_picker = function(opts)
+	local storage_picker = require("hbac.telescope.storage_picker")
+	if not storage_picker then
+		return
+	end
+	storage_picker.storage_picker(opts)
 end
 
 return M

@@ -10,7 +10,7 @@ M.display = function(entry)
 	local bufnr, bufname = entry.value, entry.ordinal
 
 	local function get_pin_icon()
-		local pin_icons = hbac_config.telescope.pin_icons
+		local pin_icons = hbac_config.telescope.pin_picker.pin_icons
 		local is_pinned = state.is_pinned(bufnr)
 		local pin_icon = is_pinned and pin_icons.pinned[1] or pin_icons.unpinned[1]
 		local pin_icon_hl = is_pinned and pin_icons.pinned.hl or pin_icons.unpinned.hl

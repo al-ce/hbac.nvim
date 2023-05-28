@@ -1,3 +1,8 @@
+local check_dependencies = require("hbac.telescope.telescope_utils").check_dependencies
+if not check_dependencies() then
+	return false
+end
+
 local state = require("hbac.state")
 local hbac_config = require("hbac.setup").opts
 local utils = require("hbac.utils")

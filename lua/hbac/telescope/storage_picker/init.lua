@@ -1,16 +1,14 @@
--- TODO: check telescope dependencies
-
 local conf = require("telescope.config").values
 local pickers = require("telescope.pickers")
 
-local attach_mappings = require("hbac.storage.attach_mappings")
+local attach_mappings = require("hbac.telescope.storage_picker.attach_mappings")
 
 local M = {}
 
-M.stored_pins_picker = function(opts)
+M.storage_picker = function(opts)
 	opts = opts or {}
-	local finder = require("hbac.storage.make_finder")
-	local previewer = require("hbac.storage.previewer")
+	local finder = require("hbac.telescope.storage_picker.make_finder")
+	local previewer = require("hbac.telescope.storage_picker.previewer")
 	pickers
 		.new(opts, {
 			prompt_title = "Hbac: Stored Pins",

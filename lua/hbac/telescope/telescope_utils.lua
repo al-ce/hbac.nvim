@@ -4,12 +4,28 @@ local cwd = vim.loop.cwd()
 local os_home = vim.loop.os_homedir()
 
 local hbac_config = require("hbac.setup").opts
+local hbac_notify = require("hbac.utils").hbac_notify
 local utils = require("hbac.utils")
-local make_finder = require("hbac.telescope.make_finder").make_finder
 
 local M = {}
 
-M.refresh_picker = function(picker)
+M.check_dependencies = function()
+	local missing = ""
+	for _, dependency in ipairs({ "plenary", "telescope" }) do
+		if not pcall(require, dependency) then
+			missing = missing .. "\n- " .. dependency .. ".nvim"
+		end
+	end
+
+	if missing ~= "" then
+		local msg = "Missing dependencies:" .. missing
+		hbac_notify(msg, "error")
+		return false
+	end
+	return true
+end
+
+M.refresh_picker = function(picker, make_finder)
 	local row = picker:get_selection_row()
 	picker:register_completion_callback(function()
 		picker:set_selection(row)

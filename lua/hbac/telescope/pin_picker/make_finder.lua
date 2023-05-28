@@ -3,7 +3,7 @@ local finders = require("telescope.finders")
 local M = {}
 
 M.make_finder = function()
-	local make_display = require("hbac.telescope.make_display")
+	local make_display = require("hbac.telescope.pin_picker.make_display")
 	local utils = require("hbac.utils")
 
 	local display = make_display.display
