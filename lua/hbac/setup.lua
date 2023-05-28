@@ -16,8 +16,17 @@ local M = {
 					-- close_unpinned()
 					-- vim.cmd("tabnew")
 				end,
-				posthook = function()
-				end,
+				posthook = function() end,
+			},
+			telescope_mappings = {
+				n = {
+					open_stored_pins = "<CR>",
+					delete_stored_pins = "<M-x>",
+				},
+				i = {
+					open_stored_pins = "<CR>",
+					delete_stored_pins = "<M-x>",
+				},
 			},
 		},
 		telescope = {

@@ -3,6 +3,8 @@
 local conf = require("telescope.config").values
 local pickers = require("telescope.pickers")
 
+local attach_mappings = require("hbac.storage.attach_mappings")
+
 local M = {}
 
 M.stored_pins_picker = function(opts)
@@ -15,16 +17,7 @@ M.stored_pins_picker = function(opts)
 			finder = finder.make_finder(),
 			previewer = previewer.previewer(),
 			sorter = conf.generic_sorter(opts),
-			attach_mappings = function(_, map)
-				local hbac_storage_actions = require("hbac.storage.actions")
-				map("i", "<CR>", hbac_storage_actions.hbac_open_stored_pins)
-				map("n", "<CR>", hbac_storage_actions.hbac_open_stored_pins)
-
-				map("i", "<M-x>", hbac_storage_actions.hbac_remove_stored_pins)
-				map("n", "<M-x>", hbac_storage_actions.hbac_remove_stored_pins)
-
-				return true
-			end,
+			attach_mappings = attach_mappings.attach_mappings,
 		})
 		:find()
 end

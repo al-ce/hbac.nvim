@@ -82,7 +82,7 @@ M.store_pinned_bufs = function()
 	hbac_notify("Pin storage: '" .. keyname .. "' stored")
 end
 
-M.remove_pin_storage_entry = function(keyname)
+M.delete_pin_storage_entry = function(keyname)
 	local pin_storage = M.get_pin_storage() or {}
 	local keynames = vim.tbl_keys(pin_storage)
 	if #keynames == 0 then
