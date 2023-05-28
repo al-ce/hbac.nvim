@@ -39,35 +39,63 @@ with [lazy.nvim](https://github.com/folke/lazy.nvim)
 ```
 
 # configuration
+
 ```lua
-require("hbac").setup({
-  autoclose     = true, -- set autoclose to false if you want to close manually
-  threshold     = 10, -- hbac will start closing unedited buffers once that number is reached
+local opts = {
+  autoclose = true,
+  threshold = 10,
+  close_buffers_with_windows = false,
   close_command = function(bufnr)
     vim.api.nvim_buf_delete(bufnr, {})
   end,
-  close_buffers_with_windows = false, -- hbac will close buffers with associated windows if this option is `true`
-  notify = true, -- whether to display notifications after an Hbac command
-  telescope = {
-    mappings = {
-      n = {
-        close_unpinned = "<M-c>",
-        delete_buffer = "<M-x>",
-        pin_all = "<M-a>",
-        unpin_all = "<M-u>",
-        toggle_selections = "<M-y>",
-      },
-      i = {
-        -- as above
-      },
-    },
-    -- Pinned/unpinned icons and their hl groups. Defaults to nerdfont icons
-    pin_icons = {
-      pinned = { "󰐃 ", hl = "DiagnosticOk" },
-      unpinned = { "󰤱 ", hl = "DiagnosticError" },
+  notify = true,  -- show or hide notifications on Hbac actions
+  storage = {
+    open = {
+      -- pre- and posthook are called before/after stored pins are opened
+      prehook = function()
+        -- local close_unpinned = require("hbac.command.subcommands").close_unpinned
+        -- close_unpinned()
+        -- vim.cmd("tabnew")
+      end,
+      posthook = function() end,
     },
   },
-})
+  telescope = {
+    pin_picker = {
+      mappings = {
+        n = {
+          close_unpinned = "<M-c>",
+          delete_buffer = "<M-x>",
+          pin_all = "<M-a>",
+          unpin_all = "<M-u>",
+          toggle_selections = "<M-y>",
+          store_pinned_bufs = "<M-s>",
+        },
+        i = {
+          -- as above
+        },
+      },
+      -- Pinned/unpinned icons and their hl groups. Defaults to nerdfont icons
+      pin_icons = {
+        pinned = { "󰐃 ", hl = "DiagnosticOk" },
+        unpinned = { "󰤱 ", hl = "DiagnosticError" },
+      },
+    },
+    storage_picker = {
+      mappings = {
+        n = {
+          open_stored_pins = "<CR>",
+          delete_stored_pins = "<M-x>",
+        },
+        i = {
+          -- as above
+        },
+      },
+    },
+  },
+},
+
+require("hbac").setup(opts)
 ```
 
 # usage
@@ -80,7 +108,9 @@ or
 - `:Hbac pin_all` - pin all buffers
 - `:Hbac unpin_all` - unpin all buffers
 - `:Hbac toggle_autoclose` - toggle autoclose behavior
-- `:Hbac telescope` - open the telescope picker
+- `:Hbac pin_picker` - open the telescope picker to manage the pin states of buffers
+- `:Hbac store_pinned_bufs` - store the currently pinned bufs in a JSON file
+- `:Hbac storage_picker` - open the telescope picker to load/delete stored pins
 
 or, if you prefer to use lua:
 ```lua
@@ -90,14 +120,19 @@ hbac.close_unpinned()
 hbac.pin_all()
 hbac.unpin_all()
 hbac.toggle_autoclose()
-hbac.telescope()
+hbac.pin_picker()
+hbac.store_pinned_bufs()
+hbac.storage_picker()
 ```
 
 ## Telescope integration
 
-The plugin provides a [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) integration to view and manage the pin states of buffers. This requires telescope and its dependency [plenary.nvim](https://github.com/nvim-lua/plenary.nvim). [nvim-web-devicons](https://github.com/nvim-tree/nvim-web-devicons) is also recommended.
+The plugin provides [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) integration for the pin state management and storing and loading pinned buffers.
+This requires telescope and its dependency [plenary.nvim](https://github.com/nvim-lua/plenary.nvim). We also recommend [nvim-web-devicons](https://github.com/nvim-tree/nvim-web-devicons).
 
-The picker provides the following actions:
+### Pin Picker
+
+Views and manage the pin states of buffers. The picker provides the following actions:
 
 - `hbac_toggle_selections` - toggle the pin state of the selected buffers (either
   single or multi-selections)
@@ -105,6 +140,7 @@ The picker provides the following actions:
 - `hbac_unpin_all` - unpin all buffers
 - `hbac_close_unpinned` - close all unpinned buffers
 - `hbac_delete_buffer` - delete the selected buffers with the function set in `opts.close_command` (`nvim_buf_delete` by default`)
+- `hbac_store_pinned_bufs` - store the currently pinned buffers in a JSON file. See section below for details.
 
 You can also call the picker function directly and pass a table of options (see `:h telescope.setup()` for valid option keys):
 
@@ -116,7 +152,43 @@ require("hbac.telescope").pin_picker({
 })
 ```
 
-## How to check the pin status of the current buffer
+### Storage Picker
+
+You can save the filepath and related data of multiple sets of pinned buffers in a JSON file. This allows you to quickly load and restore pinned buffers for different projects or workflows.
+
+You can store pins with either the `:Hbac store_pinned_bufs` command or the `hbac_store_pinned_bufs` action in the pin picker (default `<M-s>`). Either one will prompt you for a name for the set of pins. If the name already exists as a key in the JSON file, you will be asked to confirm the overwrite.
+
+The storage picker lets you view, load, or delete sets of stored pins. In the
+picker's previewer, you will see the date the pins were stored and the files that were pinned, including their paths relative to the project root they were stored from.
+
+The picker provides the following actions:
+
+- `hbac_open_stored_pins` - open the selected set of stored pins
+- `hbac_delete_stored_pins` - delete the selected set of stored pins (with confirmation)
+
+#### Pre- and Posthooks
+
+You can define pre- and posthooks for the `open` action in the `storage` option table. These hooks are called before and after the stored pins are opened. You can use them to close unpinned buffers, open a new tab, or whatever you like.
+
+```lua
+require("hbac").setup({
+  storage = {
+    open = {
+      prehook = function()
+        -- set all buffers to unpinned
+        -- [[some function to do that]]
+        require("hbac.command.subcommands").close_unpinned()
+        vim.cmd("tabnew")
+      end,
+      posthook = function()
+        -- maybe open the pin picker, run some command in the terminal, etc.
+      end,
+    },
+  },
+})
+```
+
+## Other ways to view the pin status of buffers
 
 The `state` module exposes the `is_pinned` function, which returns the pin status of any buffer as a boolean value. You can use this check to display the pin status in your statusline or wherever you find convenient. Here is an example [lualine.nvim](https://github.com/nvim-lualine/lualine.nvim) integration:
 
