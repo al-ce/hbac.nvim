@@ -5,7 +5,7 @@ end
 
 local state = require("hbac.state")
 local hbac_config = require("hbac.setup").opts
-local utils = require("hbac.utils")
+local hbac_utils = require("hbac.utils")
 local hbac_telescope_utils = require("hbac.telescope.telescope_utils")
 local hbac_notify = require("hbac.utils").hbac_notify
 
@@ -27,7 +27,7 @@ end
 local function get_pinned_bufnrs()
 	return vim.tbl_filter(function(bufnr)
 		return state.pinned_buffers[bufnr]
-	end, utils.get_listed_buffers())
+	end, hbac_utils.get_listed_buffers())
 end
 
 local function make_pinned_bufs_data(pinned_bufnrs)
@@ -84,7 +84,12 @@ M.store_pinned_bufs = function()
 	end
 	pin_storage[keyname] = storage_entry
 	pin_storage_file_path:write(vim.fn.json_encode(pin_storage), "w")
+
+	-- ensure notification is shown
+	local notify_state = hbac_config.notify
+	hbac_utils.set_notify(true)
 	hbac_notify("Pin storage: '" .. keyname .. "' stored")
+	hbac_utils.set_notify(notify_state)
 end
 
 M.delete_pin_storage_entry = function(keyname)
@@ -98,9 +103,17 @@ M.delete_pin_storage_entry = function(keyname)
 		hbac_notify("No pin storage entry with that name", "warn")
 		return
 	end
+
+	local msg = "Hbac Pin Storage\nRemove entry '%s'? (y/n): "
+	local remove = vim.fn.input(string.format(msg, keyname))
+	if remove ~= "y" then
+		hbac_notify("Pin storage cancelled", "warn")
+		return
+	end
+
 	pin_storage[keyname] = nil
 	pin_storage_file_path:write(vim.fn.json_encode(pin_storage), "w")
-	hbac_notify("Pin storage: '" .. keyname .. "' removed")
+	hbac_notify("Pin storage: '" .. keyname .. "' removed", "warn")
 end
 
 M.open_pin_storage_entry = function(keyname)

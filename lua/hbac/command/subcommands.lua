@@ -1,22 +1,22 @@
 local autocommands = require("hbac.autocommands")
 local hbac_config = require("hbac.setup").opts
 local state = require("hbac.state")
-local utils = require("hbac.utils")
+local hbac_utils = require("hbac.utils")
 local hbac_notify = require("hbac.utils").hbac_notify
 
 local M = {}
 
 local set_all = function(pin_value)
-	local buflist = utils.get_listed_buffers()
+	local buflist = hbac_utils.get_listed_buffers()
 	for _, bufnr in ipairs(buflist) do
 		state.pinned_buffers[bufnr] = pin_value
 	end
 end
 
 M.close_unpinned = function()
-	local buflist = utils.get_listed_buffers()
+	local buflist = hbac_utils.get_listed_buffers()
 	for _, bufnr in ipairs(buflist) do
-		if utils.buf_autoclosable(bufnr) then
+		if hbac_utils.buf_autoclosable(bufnr) then
 			hbac_config.close_command(bufnr)
 		end
 	end

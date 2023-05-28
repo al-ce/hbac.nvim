@@ -4,13 +4,13 @@ local M = {}
 
 M.make_finder = function()
 	local make_display = require("hbac.telescope.pin_picker.make_display")
-	local utils = require("hbac.utils")
+	local hbac_utils = require("hbac.utils")
 
 	local display = make_display.display
 
 	local function get_entries()
 		local entries = {}
-		local buflist = utils.get_listed_buffers()
+		local buflist = hbac_utils.get_listed_buffers()
 		for _, bufnr in ipairs(buflist) do
 			local bufname = vim.api.nvim_buf_get_name(bufnr)
 			table.insert(entries, {

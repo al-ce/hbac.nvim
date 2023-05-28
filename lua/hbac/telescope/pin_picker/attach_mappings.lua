@@ -2,16 +2,20 @@ local hbac_config = require("hbac.setup").opts
 local state = require("hbac.state")
 local subcommands = require("hbac.command.subcommands")
 local hbac_telescope_utils = require("hbac.telescope.telescope_utils")
+local hbac_utils = require("hbac.utils")
 
 local action_state = require("telescope.actions.state")
 
 local M = {}
 
 local function pin_picker_action(prompt_bufnr, action)
+	local notify = hbac_config.notify
+	hbac_utils.set_notify(false)
 	local make_finder = require("hbac.telescope.pin_picker.make_finder")
 	local picker = action_state.get_current_picker(prompt_bufnr)
 	hbac_telescope_utils.execute_telescope_action(picker, action)
 	hbac_telescope_utils.refresh_picker(picker, make_finder.make_finder)
+	hbac_utils.set_notify(notify)
 end
 
 local function hbac_toggle_selections(prompt_bufnr)

@@ -3,9 +3,7 @@ local Path = require("plenary.path")
 local cwd = vim.loop.cwd()
 local os_home = vim.loop.os_homedir()
 
-local hbac_config = require("hbac.setup").opts
 local hbac_notify = require("hbac.utils").hbac_notify
-local utils = require("hbac.utils")
 
 local M = {}
 
@@ -35,8 +33,6 @@ end
 
 M.execute_telescope_action = function(picker, action)
 	local multi_selection = picker:get_multi_selection()
-	local notify = hbac_config.notify
-	utils.set_notify(false)
 	if next(multi_selection) then
 		for _, entry in ipairs(multi_selection) do
 			action(entry.value)
@@ -45,7 +41,6 @@ M.execute_telescope_action = function(picker, action)
 		local single_selection = action_state.get_selected_entry()
 		action(single_selection.value)
 	end
-	utils.set_notify(notify)
 end
 
 M.format_filepath = function(bufname)

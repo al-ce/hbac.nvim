@@ -1,7 +1,7 @@
 local M = {}
 
 local state = require("hbac.state")
-local utils = require("hbac.utils")
+local hbac_utils = require("hbac.utils")
 
 local CONSTANTS = {
 	AUGROUP_AUTO_CLOSE = "hbac_autoclose",
@@ -61,7 +61,7 @@ M.autoclose.setup = function()
 
 			for i = 1, buffers_to_close, 1 do
 				local buffer = buffers[i]
-				if not utils.buf_autoclosable(buffer) then
+				if not hbac_utils.buf_autoclosable(buffer) then
 					break
 				else
 					config.close_command(buffer)
