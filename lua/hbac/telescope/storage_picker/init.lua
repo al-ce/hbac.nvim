@@ -1,3 +1,8 @@
+local check_dependencies = require("hbac.telescope.telescope_utils").check_dependencies
+if not check_dependencies() then
+	return false
+end
+
 local conf = require("telescope.config").values
 local pickers = require("telescope.pickers")
 
