@@ -8,6 +8,8 @@ You like using the buffer list, but you hate it when it has too many buffers, be
 Reddit user **xmsxms** [posted](https://www.reddit.com/r/neovim/comments/12c4ad8/closing_unused_buffers/?utm_source=share&utm_medium=web2x&context=3) a script that marks all once edited files in a session as important and provides a keybinding to close all the rest. In fact, I used some of his code in this plugin, and you can achieve the same effect as his script using hbac.
 The main feature of this plugin, however, is the automatic closing of buffers. If the number of buffers reaches a threshold (default is 10), the oldest unedited buffer will be closed once you open a new one.
 
+https://github.com/al-ce/hbac.nvim/assets/23170004/18901c60-b732-47be-93a7-e5acdb4ce53d
+
 # installation
 
 with [packer.nvim](https://github.com/wbthomason/packer.nvim)
@@ -152,6 +154,8 @@ require("hbac.telescope").pin_picker({
 })
 ```
 
+https://github.com/al-ce/hbac.nvim/assets/23170004/b9686a4d-7656-4220-a32c-6193517a2009
+
 ### Storage Picker
 
 You can save the filepath and related data of multiple sets of pinned buffers in a JSON file. This allows you to quickly load and restore pinned buffers for different projects or workflows.
@@ -165,6 +169,9 @@ The picker provides the following actions:
 
 - `hbac_open_stored_pins` - open the selected set of stored pins
 - `hbac_delete_stored_pins` - delete the selected set of stored pins (with confirmation)
+
+
+https://github.com/al-ce/hbac.nvim/assets/23170004/17948123-2f2d-4070-89b7-334fcff656e6
 
 #### Pre- and Posthooks
 
