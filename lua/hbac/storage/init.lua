@@ -5,11 +5,9 @@ end
 
 local state = require("hbac.state")
 local hbac_config = require("hbac.setup").opts
-local hbac_utils = require("hbac.utils")
-local hbac_telescope_utils = require("hbac.telescope.telescope_utils")
+local hbac_storage_utils = require("hbac.storage.utils")
 local hbac_notify = require("hbac.utils").hbac_notify
 
-local cwd = vim.fn.getcwd() or vim.fn.expand("%:p:h")
 local Path = require("plenary.path")
 local data_dir = vim.fn.stdpath("data")
 local pin_storage_file_path = Path:new(data_dir, "pin_storage.json")
@@ -24,90 +22,30 @@ M.get_pin_storage = function()
 	return vim.fn.json_decode(content)
 end
 
-local function get_pinned_bufnrs()
-	return vim.tbl_filter(function(bufnr)
-		return state.pinned_buffers[bufnr]
-	end, hbac_utils.get_listed_buffers())
-end
-
-local function make_pinned_bufs_data(pinned_bufnrs)
-	local pinned_bufs_data = {}
-	for _, bufnr in ipairs(pinned_bufnrs) do
-		local bufname = vim.fn.bufname(bufnr)
-		local filepath = hbac_telescope_utils.format_filepath(bufname)
-		local filename = vim.fn.fnamemodify(bufname, ":t")
-		local abs_path = vim.fn.fnamemodify(bufname, ":p")
-		table.insert(pinned_bufs_data, {
-			abs_path = abs_path,
-			filename = filename,
-			filepath = filepath,
-		})
-	end
-	return pinned_bufs_data
-end
-
-local function create_storage_entry(pinned_bufs_data)
-	local keyname = vim.fn.input("Hbac Pin Storage\nEntry name (leave blank to use timestamp): ")
-	local timestamp = os.date("%Y-%m-%d %H:%M:%S")
-	keyname = keyname == "" and tostring(timestamp) or keyname
-	local proj_root = cwd:gsub(vim.env.HOME, "~")
-	return keyname, {
-		proj_root = proj_root,
-		stored_pins = pinned_bufs_data,
-		timestamp = timestamp,
-	}
-end
-
-local function confirm_duplicate_overwrite(pin_storage, keyname)
-	if not pin_storage[keyname] then
-		return true
-	end
-	local msg = "Hbac Pin Storage\nEntry with name '%s' already exists. Overwrite? (y/n): "
-	local overwrite = vim.fn.input(string.format(msg, keyname))
-	if overwrite == "y" then
-		return true
-	end
-	hbac_notify("Pin storage cancelled", "warn")
-end
-
 M.store_pinned_bufs = function()
-	local pinned_bufnrs = get_pinned_bufnrs()
+	local pinned_bufnrs = hbac_storage_utils.get_pinned_bufnrs()
 	if #pinned_bufnrs == 0 then
 		hbac_notify("No pins to store", "warn")
 		return nil
 	end
-	local pinned_bufs_data = make_pinned_bufs_data(pinned_bufnrs)
+	local pinned_bufs_data = hbac_storage_utils.make_pinned_bufs_data(pinned_bufnrs)
 	local pin_storage = M.get_pin_storage()
-	local keyname, storage_entry = create_storage_entry(pinned_bufs_data)
-	if not confirm_duplicate_overwrite(pin_storage, keyname) then
+	local keyname, storage_entry = hbac_storage_utils.create_storage_entry(pinned_bufs_data)
+	local overwrite = hbac_storage_utils.confirm_duplicate_entry_overwrite(pin_storage, keyname)
+	if not overwrite then
 		return
 	end
 	pin_storage[keyname] = storage_entry
 	pin_storage_file_path:write(vim.fn.json_encode(pin_storage), "w")
 
-	-- ensure notification is shown
-	local notify_state = hbac_config.notify
-	hbac_utils.set_notify(true)
-	hbac_notify("Pin storage: '" .. keyname .. "' stored")
-	hbac_utils.set_notify(notify_state)
+	hbac_storage_utils.storage_notification(keyname)
 end
 
 M.delete_pin_storage_entry = function(keyname)
 	local pin_storage = M.get_pin_storage() or {}
-	local keynames = vim.tbl_keys(pin_storage)
-	if #keynames == 0 then
-		hbac_notify("No pin storage entries to remove", "warn")
-		return
-	end
-	if not pin_storage[keyname] then
-		hbac_notify("No pin storage entry with that name", "warn")
-		return
-	end
 
-	local msg = "Hbac Pin Storage\nRemove entry '%s'? (y/n): "
-	local remove = vim.fn.input(string.format(msg, keyname))
-	if remove ~= "y" then
-		hbac_notify("Pin storage cancelled", "warn")
+	local storage_deletion_checks = hbac_storage_utils.deletion_checks(pin_storage, keyname)
+	if not storage_deletion_checks then
 		return
 	end
 
