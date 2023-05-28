@@ -8,6 +8,7 @@ return {
 	telescope = subcommands.telescope,
 	pin_all = subcommands.pin_all,
 	unpin_all = subcommands.unpin_all,
+	store_pinned_bufs = subcommands.store_pinned_bufs,
 	toggle_autoclose = subcommands.toggle_autoclose,
 	toggle_pin = subcommands.toggle_pin,
 }

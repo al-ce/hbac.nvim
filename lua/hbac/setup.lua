@@ -37,6 +37,7 @@ local M = {
 					pin_all = "<M-a>",
 					unpin_all = "<M-u>",
 					toggle_selections = "<M-y>",
+					store_pinned_bufs = "<M-s>",
 				},
 				i = {
 					close_unpinned = "<M-c>",
@@ -44,6 +45,7 @@ local M = {
 					pin_all = "<M-a>",
 					unpin_all = "<M-u>",
 					toggle_selections = "<M-y>",
+					store_pinned_bufs = "<M-s>",
 				},
 			},
 			pin_icons = {

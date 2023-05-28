@@ -11,8 +11,8 @@ local set_all = function(pin_value)
 	for _, bufnr in ipairs(buflist) do
 		state.pinned_buffers[bufnr] = pin_value
 	end
-
 end
+
 M.close_unpinned = function()
 	local buflist = utils.get_listed_buffers()
 	for _, bufnr in ipairs(buflist) do
@@ -57,6 +57,11 @@ M.telescope = function(opts)
 		return
 	end
 	hbac_telescope.pin_picker(opts)
+end
+
+M.store_pinned_bufs = function()
+	local storage = require("hbac.storage")
+	storage.store_pinned_bufs()
 end
 
 return M

@@ -29,6 +29,10 @@ local function hbac_delete_buffer(prompt_bufnr)
 	pin_picker_action(prompt_bufnr, hbac_config.close_command)
 end
 
+local function hbac_store_pinned_bufs(prompt_bufnr)
+	pin_picker_action(prompt_bufnr, subcommands.store_pinned_bufs)
+end
+
 M.attach_mappings = function(_, map)
 	local hbac_telescope_actions = {
 		close_unpinned = hbac_close_unpinned,
@@ -36,6 +40,7 @@ M.attach_mappings = function(_, map)
 		pin_all = hbac_pin_all,
 		unpin_all = hbac_unpin_all,
 		toggle_selections = hbac_toggle_selections,
+		store_pinned_bufs = hbac_store_pinned_bufs,
 	}
 
 	for mode, hbac_cmds in pairs(hbac_config.telescope.mappings) do
