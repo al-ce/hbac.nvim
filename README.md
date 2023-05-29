@@ -100,6 +100,7 @@ local opts = {
           delete_stored_pins = "<M-x>",
           rename_stored_pins = "<M-r>",
           clear_pin_storage = "<M-d>",
+          preview_stored_pins = "<C-p>",
         },
         i = {
           -- as above
@@ -182,6 +183,7 @@ The picker provides the following actions:
 - `hbac_delete_stored_pins` - delete the selected set of stored pins (with confirmation)
 - `hbac_rename_stored_pins` - rename the selected set of stored pins
 - `hbac_clear_pin_storage` - delete all stored pins (with confirmation)
+- `hbac_preview_stored_pins` - open a new picker to preview the selected set of stored pins. `<Esc>` will close the previewer and return to the storage picker.
 
 
 https://github.com/al-ce/hbac.nvim/assets/23170004/17948123-2f2d-4070-89b7-334fcff656e6
