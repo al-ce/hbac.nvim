@@ -49,10 +49,12 @@ local M = {
 					n = {
 						open_stored_pins = "<CR>",
 						delete_stored_pins = "<M-x>",
+						rename_stored_pins = "<M-r>",
 					},
 					i = {
 						open_stored_pins = "<CR>",
 						delete_stored_pins = "<M-x>",
+						rename_stored_pins = "<M-r>",
 					},
 				},
 			},

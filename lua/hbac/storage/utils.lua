@@ -53,16 +53,21 @@ M.confirm_duplicate_entry_overwrite = function(pin_storage, keyname)
 	hbac_notify("Pin storage cancelled", "warn")
 end
 
-M.deletion_checks = function(pin_storage, keyname)
+M.general_storage_checks = function(pin_storage, keyname)
 	local keynames = vim.tbl_keys(pin_storage)
 	if #keynames == 0 then
-		hbac_notify("No pin storage entries to remove", "warn")
+		hbac_notify("Pin storage: no stored pins", "warn")
 		return
 	end
 	if not pin_storage[keyname] then
-		hbac_notify("No pin storage entry with that name", "warn")
+		hbac_notify("Pin storage: no entry with that name", "warn")
 		return
 	end
+	return true
+end
+
+M.deletion_checks = function(pin_storage, keyname)
+	M.general_storage_checks(pin_storage, keyname)
 	local msg = "Hbac Pin Storage\nRemove entry '%s'? (y/n): "
 	local remove = vim.fn.input(string.format(msg, keyname))
 	if remove ~= "y" then
@@ -70,6 +75,22 @@ M.deletion_checks = function(pin_storage, keyname)
 		return
 	end
 	return true
+end
+
+M.rename_checks = function(pin_storage, keyname)
+	M.general_storage_checks(pin_storage, keyname)
+	local msg = "Hbac Pin Storage\nRename entry '%s' to: "
+	local new_keyname = vim.fn.input(string.format(msg, keyname))
+	if new_keyname == "" then
+		hbac_notify("Pin storage: new name cannot be empty\n'" .. keyname .. "' not renamed", "warn")
+		return
+	end
+	local overwrite = M.confirm_duplicate_entry_overwrite(pin_storage, new_keyname)
+	if not overwrite then
+		hbac_notify("Pin storage: '" .. keyname .. "' not renamed", "warn")
+		return
+	end
+	return new_keyname
 end
 
 M.storage_notification = function(keyname)

@@ -38,12 +38,10 @@ end
 
 M.delete_pin_storage_entry = function(keyname)
 	local pin_storage = M.get_pin_storage() or {}
-
 	local storage_deletion_checks = hbac_storage_utils.deletion_checks(pin_storage, keyname)
 	if not storage_deletion_checks then
 		return
 	end
-
 	pin_storage[keyname] = nil
 	pin_storage_file_path:write(vim.fn.json_encode(pin_storage), "w")
 	hbac_notify("Pin storage: '" .. keyname .. "' removed", "warn")
@@ -51,8 +49,7 @@ end
 
 M.open_pin_storage_entry = function(keyname)
 	local pin_storage = M.get_pin_storage() or {}
-	if not pin_storage[keyname] then
-		hbac_notify("No pin storage entry with that name", "warn")
+	if not hbac_storage_utils.general_storage_checks(pin_storage, keyname) then
 		return
 	end
 	hbac_config.storage.open.prehook()
@@ -65,6 +62,18 @@ M.open_pin_storage_entry = function(keyname)
 	end
 	hbac_config.storage.open.posthook()
 	hbac_notify("Pin storage: '" .. keyname .. "' opened")
+end
+
+M.rename_pin_storage_entry = function(keyname)
+	local pin_storage = M.get_pin_storage() or {}
+	local new_keyname = hbac_storage_utils.rename_checks(pin_storage, keyname)
+	if not new_keyname then
+		return
+	end
+	pin_storage[new_keyname] = pin_storage[keyname]
+	pin_storage[keyname] = nil
+	pin_storage_file_path:write(vim.fn.json_encode(pin_storage), "w")
+	hbac_notify("Pin storage: '" .. keyname .. "' renamed to '" .. new_keyname .. "'")
 end
 
 return M
