@@ -89,6 +89,7 @@ local opts = {
           open_stored_pins = "<CR>",
           delete_stored_pins = "<M-x>",
           rename_stored_pins = "<M-r>",
+          clear_pin_storage = "<M-d>",
         },
         i = {
           -- as above
@@ -163,14 +164,14 @@ You can save the filepath and related data of multiple sets of pinned buffers in
 
 You can store pins with either the `:Hbac store_pinned_bufs` command or the `hbac_store_pinned_bufs` action in the pin picker (default `<M-s>`). Either one will prompt you for a name for the set of pins. If the name already exists as a key in the JSON file, you will be asked to confirm the overwrite.
 
-The storage picker lets you view, load, or delete sets of stored pins. In the
-picker's previewer, you will see the date the pins were stored and the files that were pinned, including their paths relative to the project root they were stored from.
+The storage picker lets you view, load, or delete sets of stored pins. In the picker's previewer, you will see the date the pins were stored and the files that were pinned, including their paths relative to the project root they were stored from.
 
 The picker provides the following actions:
 
 - `hbac_open_stored_pins` - open the selected set of stored pins
 - `hbac_delete_stored_pins` - delete the selected set of stored pins (with confirmation)
 - `hbac_rename_stored_pins` - rename the selected set of stored pins
+- `hbac_clear_pin_storage` - delete all stored pins (with confirmation)
 
 
 https://github.com/al-ce/hbac.nvim/assets/23170004/17948123-2f2d-4070-89b7-334fcff656e6

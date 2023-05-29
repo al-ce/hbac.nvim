@@ -76,4 +76,17 @@ M.rename_pin_storage_entry = function(keyname)
 	hbac_notify("Pin storage: '" .. keyname .. "' renamed to '" .. new_keyname .. "'")
 end
 
+M.clear_pin_storage = function()
+	local msg = [[--Hbac Pin Storage--
+WARNING! This will clear all pin storage entries.
+Type 'DELETE' to confirm or anything else to cancel: ]]
+	local user_input = vim.fn.input(msg)
+	if user_input ~= "DELETE" then
+		hbac_notify("Pin storage clear cancelled", "warn")
+		return
+	end
+	pin_storage_file_path:write(vim.fn.json_encode({}), "w")
+	hbac_notify("Pin storage cleared", "warn")
+end
+
 return M

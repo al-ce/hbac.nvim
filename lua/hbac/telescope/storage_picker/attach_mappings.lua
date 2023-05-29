@@ -28,11 +28,17 @@ local function hbac_rename_stored_pins(prompt_bufnr)
 	storage_picker_action(prompt_bufnr, rename_stored_pins)
 end
 
+local function hbac_clear_pin_storage(prompt_bufnr)
+	local clear_pin_storage = pin_storage.clear_pin_storage
+	storage_picker_action(prompt_bufnr, clear_pin_storage)
+end
+
 M.attach_mappings = function(_, map)
 	local hbac_storage_picker_actions = {
 		open_stored_pins = hbac_open_stored_pins,
 		delete_stored_pins = hbac_delete_stored_pins,
 		rename_stored_pins = hbac_rename_stored_pins,
+		clear_pin_storage = hbac_clear_pin_storage,
 	}
 
 	for mode, hbac_cmds in pairs(hbac_config.telescope.storage_picker.mappings) do
