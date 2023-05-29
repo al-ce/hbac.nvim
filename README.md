@@ -53,12 +53,22 @@ local opts = {
   notify = true,  -- show or hide notifications on Hbac actions
   storage = {
     open = {
-      -- pre- and posthook are called before/after stored pins are opened
+      -- set to true to spread the stored pins across windows when opening
+      fill_windows = true,
+      -- prehook is called before any stored pins are opened
       prehook = function()
+        -- example of what you might do in the prehook
         -- local close_unpinned = require("hbac.command.subcommands").close_unpinned
         -- close_unpinned()
         -- vim.cmd("tabnew")
       end,
+      -- this is called on each item in storage while iterating
+      on_open = function(pin)
+        vim.cmd("silent! e " .. pin.abs_path)
+        local bufnr = vim.fn.bufnr()
+        state.pinned_buffers[bufnr] = true
+      end,
+      -- posthook is called after all stored pins are opened
       posthook = function() end,
     },
   },

@@ -56,9 +56,7 @@ M.open_pin_storage_entry = function(keyname)
 	local entry = pin_storage[keyname]
 	local stored_pins = entry.stored_pins
 	for _, pin in pairs(stored_pins) do
-		vim.cmd("silent! e " .. pin.abs_path)
-		local bufnr = vim.fn.bufnr()
-		state.pinned_buffers[bufnr] = true
+		hbac_config.storage.open.on_open(pin)
 	end
 	hbac_config.storage.open.posthook()
 	hbac_notify("Pin storage: '" .. keyname .. "' opened")

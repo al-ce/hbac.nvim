@@ -16,6 +16,11 @@ local M = {
 					-- close_unpinned()
 					-- vim.cmd("tabnew")
 				end,
+				on_open = function(pin)
+					vim.cmd("e " .. pin.abs_path)
+					local bufnr = vim.fn.bufnr()
+					state.pinned_buffers[bufnr] = true
+				end,
 				posthook = function() end,
 			},
 		},
