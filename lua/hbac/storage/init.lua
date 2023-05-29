@@ -1,4 +1,3 @@
-local state = require("hbac.state")
 local hbac_config = require("hbac.setup").opts
 local hbac_storage_utils = require("hbac.storage.utils")
 local hbac_notify = require("hbac.utils").hbac_notify

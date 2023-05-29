@@ -1,6 +1,7 @@
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 local hbac_config = require("hbac.setup").opts
+local hbac_storage_entry_previewer = require("hbac.telescope.storage_picker.storage_entry_previewer")
 local pin_storage = require("hbac.storage")
 local hbac_telescope_utils = require("hbac.telescope.telescope_utils")
 local execute_telescope_action = hbac_telescope_utils.execute_telescope_action
@@ -33,12 +34,19 @@ local function hbac_clear_pin_storage(prompt_bufnr)
 	storage_picker_action(prompt_bufnr, clear_pin_storage)
 end
 
+local hbac_preview_stored_pins = function(prompt_bufnr)
+	local preview_stored_pins = hbac_storage_entry_previewer.preview_pin_storage_entry
+	local picker = action_state.get_current_picker(prompt_bufnr)
+	execute_telescope_action(picker, preview_stored_pins)
+end
+
 M.attach_mappings = function(_, map)
 	local hbac_storage_picker_actions = {
 		open_stored_pins = hbac_open_stored_pins,
 		delete_stored_pins = hbac_delete_stored_pins,
 		rename_stored_pins = hbac_rename_stored_pins,
 		clear_pin_storage = hbac_clear_pin_storage,
+		preview_stored_pins = hbac_preview_stored_pins,
 	}
 
 	for mode, hbac_cmds in pairs(hbac_config.telescope.storage_picker.mappings) do
