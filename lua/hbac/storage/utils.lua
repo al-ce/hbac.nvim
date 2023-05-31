@@ -30,9 +30,13 @@ end
 
 M.create_storage_entry = function(pinned_bufs_data)
 	local cwd = vim.fn.getcwd() or vim.fn.expand("%:p:h")
-	local keyname = vim.fn.input("Hbac Pin Storage\nEntry name (leave blank to use timestamp): ")
+	local keyname = vim.fn.input("Hbac Pin Storage\nEntry name (or %t for timestamp): ")
+	if keyname == "" then
+    hbac_notify("Pin storage cancelled", "warn")
+		return nil, nil
+	end
 	local timestamp = os.date("%Y-%m-%d %H:%M:%S")
-	keyname = keyname == "" and tostring(timestamp) or keyname
+	keyname = keyname == "%t" and tostring(timestamp) or keyname
 	local proj_root = cwd:gsub(vim.env.HOME, "~")
 	return keyname, {
 		proj_root = proj_root,

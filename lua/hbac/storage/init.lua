@@ -25,6 +25,9 @@ M.store_pinned_bufs = function()
 	local pinned_bufs_data = hbac_storage_utils.make_pinned_bufs_data(pinned_bufnrs)
 	local pin_storage = M.get_pin_storage()
 	local keyname, storage_entry = hbac_storage_utils.create_storage_entry(pinned_bufs_data)
+  if not keyname then
+    return
+  end
 	local overwrite = hbac_storage_utils.confirm_duplicate_entry_overwrite(pin_storage, keyname)
 	if not overwrite then
 		return
