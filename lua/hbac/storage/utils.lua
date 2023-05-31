@@ -33,9 +33,9 @@ M.make_pinned_bufs_data = function(pinned_bufnrs)
 	return pinned_bufs_data
 end
 
-M.create_storage_entry = function(pinned_bufs_data)
+M.create_storage_entry = function(pinned_bufs_data, keyname)
 	local cwd = vim.fn.getcwd() or vim.fn.expand("%:p:h")
-	local keyname = vim.fn.input("Hbac Pin Storage\nEntry name (or %t for timestamp): ")
+	keyname = keyname or vim.fn.input("Hbac Pin Storage\nNew entry name (or %t for timestamp): ")
 	if keyname == "" then
 		hbac_notify("Pin storage cancelled", "warn")
 		return nil, nil
@@ -50,16 +50,18 @@ M.create_storage_entry = function(pinned_bufs_data)
 	}
 end
 
-M.confirm_duplicate_entry_overwrite = function(pin_storage, keyname)
+M.confirm_duplicate_entry_overwrite = function(pin_storage, keyname, is_update)
 	if not pin_storage[keyname] then
-		return true
+		return
 	end
-	local msg = "Hbac Pin Storage\nOverwrite existing entry '%s'? (y/n): "
-	local overwrite = vim.fn.input(string.format(msg, keyname))
+	local write_type = is_update and "Update" or "Overwrite"
+	local msg = "Hbac Pin Storage\n%s entry '%s'? (y/n): "
+	local overwrite = vim.fn.input(string.format(msg, write_type, keyname))
 	if overwrite == "y" then
 		return true
 	end
 	hbac_notify("Pin storage cancelled", "warn")
+	return false
 end
 
 M.general_storage_checks = function(pin_storage, keyname)
@@ -81,7 +83,7 @@ M.deletion_checks = function(pin_storage, keyname)
 	local msg = "Hbac Pin Storage\nRemove entry '%s'? (y/n): "
 	local remove = vim.fn.input(string.format(msg, keyname))
 	if remove ~= "y" then
-		hbac_notify("Pin storage cancelled", "warn")
+		hbac_notify("Pin deletion cancelled", "warn")
 		return
 	end
 	return true
@@ -103,10 +105,10 @@ M.rename_checks = function(pin_storage, keyname)
 	return new_keyname
 end
 
-M.storage_notification = function(keyname)
+M.storage_notification = function(keyname, is_update)
 	local notify_state = hbac_config.notify
 	hbac_utils.set_notify(true)
-	hbac_notify("Pin storage: '" .. keyname .. "' stored")
+	hbac_notify("Pin storage: '" .. keyname .. "' " .. (is_update and "updated" or "created"))
 	hbac_utils.set_notify(notify_state)
 end
 

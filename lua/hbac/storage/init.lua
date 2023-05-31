@@ -16,25 +16,28 @@ M.get_pin_storage = function()
 	return vim.fn.json_decode(content)
 end
 
-M.store_pinned_bufs = function()
+M.store_pinned_bufs = function(keyname)
 	local pinned_bufnrs = hbac_storage_utils.get_pinned_bufnrs()
 	if not pinned_bufnrs then
 		return nil
 	end
 	local pinned_bufs_data = hbac_storage_utils.make_pinned_bufs_data(pinned_bufnrs)
-	local pin_storage = M.get_pin_storage()
-	local keyname, storage_entry = hbac_storage_utils.create_storage_entry(pinned_bufs_data)
+	local pin_storage = M.get_pin_storage() or {}
+  local storage_entry
+  local is_update = keyname ~= nil and pin_storage[keyname]
+	keyname, storage_entry = hbac_storage_utils.create_storage_entry(pinned_bufs_data, keyname)
   if not keyname then
     return
   end
-	local overwrite = hbac_storage_utils.confirm_duplicate_entry_overwrite(pin_storage, keyname)
-	if not overwrite then
+	local overwrite = hbac_storage_utils.confirm_duplicate_entry_overwrite(pin_storage, keyname, is_update)
+	if overwrite == false then
 		return
-	end
+  end
+  is_update = overwrite ~= nil and true
 	pin_storage[keyname] = storage_entry
 	pin_storage_file_path:write(vim.fn.json_encode(pin_storage), "w")
 
-	hbac_storage_utils.storage_notification(keyname)
+	hbac_storage_utils.storage_notification(keyname, is_update)
 end
 
 M.delete_pin_storage_entry = function(keyname)
@@ -45,7 +48,7 @@ M.delete_pin_storage_entry = function(keyname)
 	end
 	pin_storage[keyname] = nil
 	pin_storage_file_path:write(vim.fn.json_encode(pin_storage), "w")
-	hbac_notify("Pin storage: '" .. keyname .. "' removed", "warn")
+	hbac_notify("Pin storage: '" .. keyname .. "' deleted", "warn")
 end
 
 M.open_pin_storage_entry = function(keyname)
