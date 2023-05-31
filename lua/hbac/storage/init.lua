@@ -18,8 +18,7 @@ end
 
 M.store_pinned_bufs = function()
 	local pinned_bufnrs = hbac_storage_utils.get_pinned_bufnrs()
-	if #pinned_bufnrs == 0 then
-		hbac_notify("No pins to store", "warn")
+	if not pinned_bufnrs then
 		return nil
 	end
 	local pinned_bufs_data = hbac_storage_utils.make_pinned_bufs_data(pinned_bufnrs)

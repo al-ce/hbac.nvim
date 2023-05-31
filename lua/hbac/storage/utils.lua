@@ -7,9 +7,14 @@ local hbac_telescope_utils = require("hbac.telescope.telescope_utils")
 local M = {}
 
 M.get_pinned_bufnrs = function()
-	return vim.tbl_filter(function(bufnr)
+	local pinned_buffnrs = vim.tbl_filter(function(bufnr)
 		return state.pinned_buffers[bufnr]
 	end, hbac_utils.get_listed_buffers())
+	if #pinned_buffnrs == 0 then
+		hbac_notify("No pins to store", "warn")
+		return nil
+	end
+	return pinned_buffnrs
 end
 
 M.make_pinned_bufs_data = function(pinned_bufnrs)
@@ -32,7 +37,7 @@ M.create_storage_entry = function(pinned_bufs_data)
 	local cwd = vim.fn.getcwd() or vim.fn.expand("%:p:h")
 	local keyname = vim.fn.input("Hbac Pin Storage\nEntry name (or %t for timestamp): ")
 	if keyname == "" then
-    hbac_notify("Pin storage cancelled", "warn")
+		hbac_notify("Pin storage cancelled", "warn")
 		return nil, nil
 	end
 	local timestamp = os.date("%Y-%m-%d %H:%M:%S")
@@ -49,7 +54,7 @@ M.confirm_duplicate_entry_overwrite = function(pin_storage, keyname)
 	if not pin_storage[keyname] then
 		return true
 	end
-	local msg = "Hbac Pin Storage\nEntry with name '%s' already exists. Overwrite? (y/n): "
+	local msg = "Hbac Pin Storage\nOverwrite existing entry '%s'? (y/n): "
 	local overwrite = vim.fn.input(string.format(msg, keyname))
 	if overwrite == "y" then
 		return true
@@ -71,6 +76,7 @@ M.general_storage_checks = function(pin_storage, keyname)
 end
 
 M.deletion_checks = function(pin_storage, keyname)
+	-- TODO: don't check for EVERY entry during multiselect Telescope deletion action, just confirm once
 	M.general_storage_checks(pin_storage, keyname)
 	local msg = "Hbac Pin Storage\nRemove entry '%s'? (y/n): "
 	local remove = vim.fn.input(string.format(msg, keyname))
