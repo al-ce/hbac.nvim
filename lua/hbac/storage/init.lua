@@ -21,7 +21,7 @@ M.store_pinned_bufs = function(keyname)
 	if not pinned_bufnrs then
 		return nil
 	end
-	local pinned_bufs_data = hbac_storage_utils.make_pinned_bufs_data(pinned_bufnrs)
+	local pinned_bufs_data = hbac_storage_utils.get_data_of_pinned_bufs(pinned_bufnrs)
 	local pin_storage = M.get_pin_storage() or {}
 	local storage_entry
 	local is_update = keyname ~= nil and pin_storage[keyname]
@@ -31,6 +31,7 @@ M.store_pinned_bufs = function(keyname)
 	end
 	local overwrite = hbac_storage_utils.confirm_duplicate_entry_overwrite(pin_storage, keyname, is_update)
 	if overwrite == false then
+		hbac_notify("Pin storage cancelled")
 		return
 	end
 	is_update = overwrite ~= nil and true
@@ -89,6 +90,28 @@ Type 'DELETE' to confirm or anything else to cancel: ]]
 	end
 	pin_storage_file_path:write(vim.fn.json_encode({}), "w")
 	hbac_notify("Pin storage cleared", "warn")
+end
+
+M.add_cur_buf_to_entry = function(keyname)
+	local cur_bufnr = require("hbac.telescope.storage_picker").cur_bufnr
+	cur_bufnr = cur_bufnr or vim.api.nvim_get_current_buf()
+	local pin_storage = M.get_pin_storage() or {}
+	local pin_storage_entry = pin_storage[keyname]
+	if not hbac_storage_utils.general_storage_checks(pin_storage, keyname) then
+		return
+	end
+	local cur_pinned_buf_data = hbac_storage_utils.get_single_pinned_buf_data(cur_bufnr)
+	local stored_pins = pin_storage_entry.stored_pins
+	local is_duplicate = hbac_storage_utils.file_is_in_stored_pins(stored_pins, cur_pinned_buf_data)
+	if is_duplicate then
+		local cur_buf_abs_path = cur_pinned_buf_data.abs_path
+		local msg = "Pin storage: '" .. keyname .. "' already contains this file:\n\n" .. cur_buf_abs_path
+		hbac_notify(msg, "warn")
+		return
+	end
+	table.insert(stored_pins, cur_pinned_buf_data)
+	pin_storage_file_path:write(vim.fn.json_encode(pin_storage), "w")
+	hbac_notify("Pin storage: " .. cur_pinned_buf_data.filename .. " added to '" .. keyname .. "'")
 end
 
 return M

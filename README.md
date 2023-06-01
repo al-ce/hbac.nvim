@@ -93,6 +93,7 @@ local opts = {
           clear_pin_storage = "<M-d>",
           preview_stored_pins = "<C-p>",
           update_stored_pins = "<M-u>",
+          add_cur_buf_to_entry = "<M-b>",
         },
         i = {
           -- as above
@@ -177,9 +178,10 @@ The storage picker provides the following actions:
 - `hbac_rename_stored_pins` - rename the selected set of stored pins. Default `<M-r>`
 - `hbac_clear_pin_storage` - delete all stored pins (with confirmation). Default `<M-d>`
 - `hbac_preview_stored_pins` - open a new picker to preview the selected set of stored pins. `<Esc>` will close the previewer and return to the storage picker. The results from this picker can be sent to the quickfix list or a trouble window. Default `<C-p>`
-
 - `hbac_update_stored_pins` - update the selected stored pins entry with the currently pinned buffers. Default `<M-u>`.
+- `hbac_add_cur_buf_to_entry` - add the current buffer to the selected storage entries. Default `<M-b>`
 
+Note that most of these actions are exposed functions in the `hbac.storage` module and can be called directly, but the storage picker makes it easy to handle all these actions.
 
 https://github.com/al-ce/hbac.nvim/assets/23170004/17948123-2f2d-4070-89b7-334fcff656e6
 

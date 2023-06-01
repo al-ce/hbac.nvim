@@ -6,6 +6,16 @@ local hbac_telescope_utils = require("hbac.telescope.telescope_utils")
 
 local M = {}
 
+M.file_is_in_stored_pins = function(stored_pins, cur_pinned_buf_data)
+	for index, pinned_buf_data in ipairs(stored_pins) do
+		local inspected_cur_buf_data = vim.inspect(cur_pinned_buf_data)
+		local inspected_pinned_buf_data = vim.inspect(pinned_buf_data)
+		if inspected_cur_buf_data == inspected_pinned_buf_data then
+			return index
+		end
+	end
+end
+
 M.get_pinned_bufnrs = function()
 	local pinned_buffnrs = vim.tbl_filter(function(bufnr)
 		return state.pinned_buffers[bufnr]
@@ -32,15 +42,8 @@ end
 M.get_data_of_pinned_bufs = function(pinned_bufnrs)
 	local pinned_bufs_data = {}
 	for _, bufnr in ipairs(pinned_bufnrs) do
-		local bufname = vim.fn.bufname(bufnr)
-		local filepath = hbac_telescope_utils.format_filepath(bufname)
-		local filename = vim.fn.fnamemodify(bufname, ":t")
-		local abs_path = vim.fn.fnamemodify(bufname, ":p")
-		table.insert(pinned_bufs_data, {
-			abs_path = abs_path,
-			filename = filename,
-			filepath = filepath,
-		})
+		local buf_data = M.get_single_pinned_buf_data(bufnr)
+		table.insert(pinned_bufs_data, buf_data)
 	end
 	return pinned_bufs_data
 end

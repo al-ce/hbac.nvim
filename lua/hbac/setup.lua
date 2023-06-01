@@ -58,6 +58,7 @@ local M = {
 						clear_pin_storage = "<M-d>",
 						preview_stored_pins = "<C-p>",
 						update_stored_pins = "<M-u>",
+            add_cur_buf_to_entry = "<M-b>"
 					},
 					i = {
 						open_stored_pins = "<CR>",
@@ -66,6 +67,7 @@ local M = {
 						clear_pin_storage = "<M-d>",
 						preview_stored_pins = "<C-p>",
 						update_stored_pins = "<M-u>",
+            add_cur_buf_to_entry = "<M-b>"
 					},
 				},
 			},
