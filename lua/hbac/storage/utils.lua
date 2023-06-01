@@ -17,7 +17,19 @@ M.get_pinned_bufnrs = function()
 	return pinned_buffnrs
 end
 
-M.make_pinned_bufs_data = function(pinned_bufnrs)
+M.get_single_pinned_buf_data = function(bufnr)
+	local bufname = vim.fn.bufname(bufnr)
+	local abs_path = vim.fn.fnamemodify(bufname, ":p")
+	local filename = vim.fn.fnamemodify(bufname, ":t")
+	local filepath = hbac_telescope_utils.format_filepath(bufname)
+	return {
+		abs_path = abs_path,
+		filename = filename,
+		filepath = filepath,
+	}
+end
+
+M.get_data_of_pinned_bufs = function(pinned_bufnrs)
 	local pinned_bufs_data = {}
 	for _, bufnr in ipairs(pinned_bufnrs) do
 		local bufname = vim.fn.bufname(bufnr)
@@ -60,7 +72,6 @@ M.confirm_duplicate_entry_overwrite = function(pin_storage, keyname, is_update)
 	if overwrite == "y" then
 		return true
 	end
-	hbac_notify("Pin storage cancelled", "warn")
 	return false
 end
 
@@ -98,7 +109,7 @@ M.rename_checks = function(pin_storage, keyname)
 		return
 	end
 	local overwrite = M.confirm_duplicate_entry_overwrite(pin_storage, new_keyname)
-	if not overwrite then
+	if overwrite == false then
 		hbac_notify("Pin storage: '" .. keyname .. "' not renamed", "warn")
 		return
 	end
