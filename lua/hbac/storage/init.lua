@@ -23,17 +23,17 @@ M.store_pinned_bufs = function(keyname)
 	end
 	local pinned_bufs_data = hbac_storage_utils.make_pinned_bufs_data(pinned_bufnrs)
 	local pin_storage = M.get_pin_storage() or {}
-  local storage_entry
-  local is_update = keyname ~= nil and pin_storage[keyname]
+	local storage_entry
+	local is_update = keyname ~= nil and pin_storage[keyname]
 	keyname, storage_entry = hbac_storage_utils.create_storage_entry(pinned_bufs_data, keyname)
-  if not keyname then
-    return
-  end
+	if not keyname then
+		return
+	end
 	local overwrite = hbac_storage_utils.confirm_duplicate_entry_overwrite(pin_storage, keyname, is_update)
 	if overwrite == false then
 		return
-  end
-  is_update = overwrite ~= nil and true
+	end
+	is_update = overwrite ~= nil and true
 	pin_storage[keyname] = storage_entry
 	pin_storage_file_path:write(vim.fn.json_encode(pin_storage), "w")
 

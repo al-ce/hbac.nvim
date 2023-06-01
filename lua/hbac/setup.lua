@@ -57,6 +57,7 @@ local M = {
 						rename_stored_pins = "<M-r>",
 						clear_pin_storage = "<M-d>",
 						preview_stored_pins = "<C-p>",
+						update_stored_pins = "<M-u>",
 					},
 					i = {
 						open_stored_pins = "<CR>",
@@ -64,6 +65,7 @@ local M = {
 						rename_stored_pins = "<M-r>",
 						clear_pin_storage = "<M-d>",
 						preview_stored_pins = "<C-p>",
+						update_stored_pins = "<M-u>",
 					},
 				},
 			},

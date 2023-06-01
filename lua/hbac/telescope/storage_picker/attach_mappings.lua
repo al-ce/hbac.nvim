@@ -40,6 +40,11 @@ local hbac_preview_stored_pins = function(prompt_bufnr)
 	execute_telescope_action(picker, preview_stored_pins)
 end
 
+local hbac_update_stored_pins = function(prompt_bufnr)
+	local update_stored_pins = pin_storage.store_pinned_bufs
+	storage_picker_action(prompt_bufnr, update_stored_pins)
+end
+
 M.attach_mappings = function(_, map)
 	local hbac_storage_picker_actions = {
 		open_stored_pins = hbac_open_stored_pins,
@@ -47,6 +52,7 @@ M.attach_mappings = function(_, map)
 		rename_stored_pins = hbac_rename_stored_pins,
 		clear_pin_storage = hbac_clear_pin_storage,
 		preview_stored_pins = hbac_preview_stored_pins,
+		update_stored_pins = hbac_update_stored_pins,
 	}
 
 	for mode, hbac_cmds in pairs(hbac_config.telescope.storage_picker.mappings) do

@@ -10,7 +10,6 @@ local sorters = require("telescope.sorters")
 local M = {}
 
 local function display(pin)
-
 	local function get_display_text()
 		local display_path = hbac_telescope_utils.format_filepath(pin.abs_path)
 		if display_path == "" then
@@ -70,7 +69,6 @@ local function make_finder(keyname)
 		end,
 	})
 end
-
 
 M.preview_pin_storage_entry = function(keyname)
 	local function hbac_recall_storage_picker()
