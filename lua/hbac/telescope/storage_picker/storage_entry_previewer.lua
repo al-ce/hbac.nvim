@@ -1,6 +1,5 @@
 local hbac_storage_utils = require("hbac.storage.utils")
 local hbac_telescope_utils = require("hbac.telescope.telescope_utils")
-local execute_telescope_action = hbac_telescope_utils.execute_telescope_action
 local refresh_picker = hbac_telescope_utils.refresh_picker
 local json_encode_pin_storage = hbac_storage_utils.json_encode_pin_storage
 
@@ -72,22 +71,46 @@ local function make_finder(keyname)
 	})
 end
 
-M.preview_pin_storage_entry = function(keyname)
-	local function hbac_recall_storage_picker()
-		require("hbac.telescope.storage_picker").storage_picker()
-	end
+local hbac_remove_files_from_entry = function(prompt_bufnr)
+	local picker = action_state.get_current_picker(prompt_bufnr)
+	local pin_storage = hbac_storage_utils.get_pin_storage() or {}
+	local keyname = M.entry_keyname
+	local pin_storage_entry = pin_storage[keyname]
+	local stored_pins = pin_storage_entry.stored_pins
 
-	local hbac_remove_file_from_entry = function(prompt_bufnr)
-		local picker = action_state.get_current_picker(prompt_bufnr)
-		local pin_storage = hbac_storage_utils.get_pin_storage() or {}
-		local pin_storage_entry = pin_storage[keyname]
-		local stored_pins = pin_storage_entry.stored_pins
-		local function remove_item_from_stored_pins(index)
+	local function remove_multiple_files_from_storage_entry(multi_selection)
+		local indices_to_remove = {}
+		for _, selection in ipairs(multi_selection) do
+			table.insert(indices_to_remove, selection.index)
+		end
+		table.sort(indices_to_remove, function(a, b)
+			return a > b
+		end)
+		for _, index in ipairs(indices_to_remove) do
 			table.remove(stored_pins, index)
 		end
-		execute_telescope_action(picker, remove_item_from_stored_pins, "index")
-		json_encode_pin_storage(pin_storage)
-		refresh_picker(picker, make_finder, keyname)
+	end
+
+	local function remove_items_from_stored_pins()
+		local multi_selection = picker:get_multi_selection()
+		if next(multi_selection) then
+			remove_multiple_files_from_storage_entry(multi_selection)
+		else
+			local single_selection = action_state.get_selected_entry()
+			table.remove(stored_pins, single_selection.index)
+		end
+	end
+
+	remove_items_from_stored_pins()
+	json_encode_pin_storage(pin_storage)
+	refresh_picker(picker, make_finder, keyname)
+end
+
+M.preview_pin_storage_entry = function(keyname)
+	M.entry_keyname = keyname
+
+	local function hbac_recall_storage_picker()
+		require("hbac.telescope.storage_picker").storage_picker()
 	end
 
 	pickers
@@ -98,7 +121,7 @@ M.preview_pin_storage_entry = function(keyname)
 			previewer = previewers.vim_buffer_cat.new({}),
 			attach_mappings = function(_, map)
 				map("i", "<Esc>", hbac_recall_storage_picker)
-				map("i", "<M-x>", hbac_remove_file_from_entry)
+				map("i", "<M-x>", hbac_remove_files_from_entry)
 				return true
 			end,
 		})
