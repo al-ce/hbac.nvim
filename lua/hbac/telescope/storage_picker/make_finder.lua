@@ -1,10 +1,11 @@
 local entry_display = require("telescope.pickers.entry_display")
 local finders = require("telescope.finders")
+local hbac_storage_utils = require("hbac.storage.utils")
 
 local M = {}
 
 M.make_finder = function()
-	local pin_storage = require("hbac.storage").get_pin_storage() or {}
+	local pin_storage = hbac_storage_utils.get_pin_storage() or {}
 
 	local function get_pin_count(pin_session)
 		local stored_pins = pin_session["stored_pins"]

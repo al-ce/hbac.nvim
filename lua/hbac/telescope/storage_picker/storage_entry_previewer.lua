@@ -1,8 +1,8 @@
-local hbac_storage = require("hbac.storage")
 local hbac_storage_utils = require("hbac.storage.utils")
 local hbac_telescope_utils = require("hbac.telescope.telescope_utils")
 local execute_telescope_action = hbac_telescope_utils.execute_telescope_action
 local refresh_picker = hbac_telescope_utils.refresh_picker
+local json_encode_pin_storage = hbac_storage_utils.json_encode_pin_storage
 
 local action_state = require("telescope.actions.state")
 local finders = require("telescope.finders")
@@ -10,11 +10,6 @@ local pickers = require("telescope.pickers")
 local entry_display = require("telescope.pickers.entry_display")
 local previewers = require("telescope.previewers")
 local sorters = require("telescope.sorters")
-
--- TODO: the way to get this should be a function from storage utils
-local Path = require("plenary.path")
-local data_dir = vim.fn.stdpath("data")
-local pin_storage_file_path = Path:new(data_dir, "pin_storage.json")
 
 local M = {}
 
@@ -46,8 +41,7 @@ end
 
 local function get_entries(keyname)
 	local entries = {}
-
-	local pin_storage = hbac_storage.get_pin_storage() or {}
+	local pin_storage = hbac_storage_utils.get_pin_storage() or {}
 	if not hbac_storage_utils.general_storage_checks(pin_storage, keyname) then
 		return
 	end
@@ -61,7 +55,6 @@ local function get_entries(keyname)
 			ordinal = pin.abs_path,
 		})
 	end
-
 	return entries
 end
 
@@ -86,14 +79,14 @@ M.preview_pin_storage_entry = function(keyname)
 
 	local hbac_remove_file_from_entry = function(prompt_bufnr)
 		local picker = action_state.get_current_picker(prompt_bufnr)
-		local pin_storage = hbac_storage.get_pin_storage() or {}
+		local pin_storage = hbac_storage_utils.get_pin_storage() or {}
 		local pin_storage_entry = pin_storage[keyname]
 		local stored_pins = pin_storage_entry.stored_pins
 		local function remove_item_from_stored_pins(index)
 			table.remove(stored_pins, index)
 		end
 		execute_telescope_action(picker, remove_item_from_stored_pins, "index")
-		pin_storage_file_path:write(vim.fn.json_encode(pin_storage), "w")
+		json_encode_pin_storage(pin_storage)
 		refresh_picker(picker, make_finder, keyname)
 	end
 

@@ -1,20 +1,10 @@
 local hbac_config = require("hbac.setup").opts
 local hbac_storage_utils = require("hbac.storage.utils")
 local hbac_notify = require("hbac.utils").hbac_notify
-
-local Path = require("plenary.path")
-local data_dir = vim.fn.stdpath("data")
-local pin_storage_file_path = Path:new(data_dir, "pin_storage.json")
+local json_encode_pin_storage = hbac_storage_utils.json_encode_pin_storage
+local get_pin_storage = hbac_storage_utils.get_pin_storage
 
 local M = {}
-
-M.get_pin_storage = function()
-	if not pin_storage_file_path:exists() then
-		return {}
-	end
-	local content = pin_storage_file_path:read()
-	return vim.fn.json_decode(content)
-end
 
 M.store_pinned_bufs = function(keyname)
 	local pinned_bufnrs = hbac_storage_utils.get_pinned_bufnrs()
@@ -22,7 +12,7 @@ M.store_pinned_bufs = function(keyname)
 		return nil
 	end
 	local pinned_bufs_data = hbac_storage_utils.get_data_of_pinned_bufs(pinned_bufnrs)
-	local pin_storage = M.get_pin_storage() or {}
+	local pin_storage = get_pin_storage() or {}
 	local storage_entry
 	local is_update = keyname ~= nil and pin_storage[keyname]
 	keyname, storage_entry = hbac_storage_utils.create_storage_entry(pinned_bufs_data, keyname)
@@ -36,24 +26,23 @@ M.store_pinned_bufs = function(keyname)
 	end
 	is_update = overwrite ~= nil and true
 	pin_storage[keyname] = storage_entry
-	pin_storage_file_path:write(vim.fn.json_encode(pin_storage), "w")
-
+	json_encode_pin_storage(pin_storage)
 	hbac_storage_utils.storage_notification(keyname, is_update)
 end
 
 M.delete_pin_storage_entry = function(keyname)
-	local pin_storage = M.get_pin_storage() or {}
+	local pin_storage = get_pin_storage() or {}
 	local storage_deletion_checks = hbac_storage_utils.entry_deletion_checks(pin_storage, keyname)
 	if not storage_deletion_checks then
 		return
 	end
 	pin_storage[keyname] = nil
-	pin_storage_file_path:write(vim.fn.json_encode(pin_storage), "w")
+	json_encode_pin_storage(pin_storage)
 	hbac_notify("Pin storage: '" .. keyname .. "' deleted", "warn")
 end
 
 M.open_pin_storage_entry = function(keyname)
-	local pin_storage = M.get_pin_storage() or {}
+	local pin_storage = get_pin_storage() or {}
 	if not hbac_storage_utils.general_storage_checks(pin_storage, keyname) then
 		return
 	end
@@ -68,14 +57,14 @@ M.open_pin_storage_entry = function(keyname)
 end
 
 M.rename_pin_storage_entry = function(keyname)
-	local pin_storage = M.get_pin_storage() or {}
+	local pin_storage = get_pin_storage() or {}
 	local new_keyname = hbac_storage_utils.entry_rename_checks(pin_storage, keyname)
 	if not new_keyname then
 		return
 	end
 	pin_storage[new_keyname] = pin_storage[keyname]
 	pin_storage[keyname] = nil
-	pin_storage_file_path:write(vim.fn.json_encode(pin_storage), "w")
+	json_encode_pin_storage(pin_storage)
 	hbac_notify("Pin storage: '" .. keyname .. "' renamed to '" .. new_keyname .. "'")
 end
 
@@ -88,7 +77,7 @@ Type 'DELETE' to confirm or anything else to cancel: ]]
 		hbac_notify("Pin storage clear cancelled", "warn")
 		return
 	end
-	pin_storage_file_path:write(vim.fn.json_encode({}), "w")
+	json_encode_pin_storage({})
 	hbac_notify("Pin storage cleared", "warn")
 end
 
@@ -96,7 +85,7 @@ local function add_or_remove_file_in_entry(keyname, add_or_remove)
 	local add, remove = add_or_remove == "add", add_or_remove == "remove"
 	local cur_bufnr = require("hbac.telescope.storage_picker").cur_bufnr
 	cur_bufnr = cur_bufnr or vim.api.nvim_get_current_buf()
-	local pin_storage = M.get_pin_storage() or {}
+	local pin_storage = get_pin_storage() or {}
 	local pin_storage_entry = pin_storage[keyname]
 	if not hbac_storage_utils.general_storage_checks(pin_storage, keyname) then
 		return
@@ -124,7 +113,7 @@ local function add_or_remove_file_in_entry(keyname, add_or_remove)
 	elseif remove then
 		table.remove(stored_pins, index)
 	end
-	pin_storage_file_path:write(vim.fn.json_encode(pin_storage), "w")
+	json_encode_pin_storage(pin_storage)
 	local to_or_from = (add and "added to" or (remove and "removed from"))
 	hbac_notify("Pin storage: " .. cur_pinned_buf_data.filename .. " " .. to_or_from .. " '" .. keyname .. "'")
 end

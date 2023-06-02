@@ -4,7 +4,23 @@ local state = require("hbac.state")
 local hbac_utils = require("hbac.utils")
 local hbac_telescope_utils = require("hbac.telescope.telescope_utils")
 
+local Path = require("plenary.path")
+local data_dir = vim.fn.stdpath("data")
+local pin_storage_file_path = Path:new(data_dir, "hbac_pin_storage.json")
+
 local M = {}
+
+M.get_pin_storage = function()
+	if not pin_storage_file_path:exists() then
+		return {}
+	end
+	local content = pin_storage_file_path:read()
+	return vim.fn.json_decode(content)
+end
+
+M.json_encode_pin_storage = function(pin_storage)
+	pin_storage_file_path:write(vim.fn.json_encode(pin_storage), "w")
+end
 
 M.file_is_in_stored_pins = function(stored_pins, cur_pinned_buf_data)
 	for index, pinned_buf_data in ipairs(stored_pins) do
