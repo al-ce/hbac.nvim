@@ -91,7 +91,7 @@ M.general_storage_checks = function(pin_storage, keyname)
 	return true
 end
 
-M.deletion_checks = function(pin_storage, keyname)
+M.entry_deletion_checks = function(pin_storage, keyname)
 	-- TODO: don't check for EVERY entry during multiselect Telescope deletion action, just confirm once
 	M.general_storage_checks(pin_storage, keyname)
 	local msg = "Hbac Pin Storage\nRemove entry '%s'? (y/n): "
@@ -103,7 +103,7 @@ M.deletion_checks = function(pin_storage, keyname)
 	return true
 end
 
-M.rename_checks = function(pin_storage, keyname)
+M.entry_rename_checks = function(pin_storage, keyname)
 	M.general_storage_checks(pin_storage, keyname)
 	local msg = "Hbac Pin Storage\nRename entry '%s' to: "
 	local new_keyname = vim.fn.input(string.format(msg, keyname))

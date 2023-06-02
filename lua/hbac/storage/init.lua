@@ -43,7 +43,7 @@ end
 
 M.delete_pin_storage_entry = function(keyname)
 	local pin_storage = M.get_pin_storage() or {}
-	local storage_deletion_checks = hbac_storage_utils.deletion_checks(pin_storage, keyname)
+	local storage_deletion_checks = hbac_storage_utils.entry_deletion_checks(pin_storage, keyname)
 	if not storage_deletion_checks then
 		return
 	end
@@ -69,7 +69,7 @@ end
 
 M.rename_pin_storage_entry = function(keyname)
 	local pin_storage = M.get_pin_storage() or {}
-	local new_keyname = hbac_storage_utils.rename_checks(pin_storage, keyname)
+	local new_keyname = hbac_storage_utils.entry_rename_checks(pin_storage, keyname)
 	if not new_keyname then
 		return
 	end
@@ -92,7 +92,8 @@ Type 'DELETE' to confirm or anything else to cancel: ]]
 	hbac_notify("Pin storage cleared", "warn")
 end
 
-M.add_cur_buf_to_entry = function(keyname)
+local function add_or_remove_file_in_entry(keyname, add_or_remove)
+	local add, remove = add_or_remove == "add", add_or_remove == "remove"
 	local cur_bufnr = require("hbac.telescope.storage_picker").cur_bufnr
 	cur_bufnr = cur_bufnr or vim.api.nvim_get_current_buf()
 	local pin_storage = M.get_pin_storage() or {}
@@ -101,17 +102,39 @@ M.add_cur_buf_to_entry = function(keyname)
 		return
 	end
 	local cur_pinned_buf_data = hbac_storage_utils.get_single_pinned_buf_data(cur_bufnr)
-	local stored_pins = pin_storage_entry.stored_pins
-	local is_duplicate = hbac_storage_utils.file_is_in_stored_pins(stored_pins, cur_pinned_buf_data)
-	if is_duplicate then
-		local cur_buf_abs_path = cur_pinned_buf_data.abs_path
-		local msg = "Pin storage: '" .. keyname .. "' already contains this file:\n\n" .. cur_buf_abs_path
-		hbac_notify(msg, "warn")
+	if not cur_pinned_buf_data then
+		hbac_notify("Pin storage: No file found for current buffer", "warn")
 		return
 	end
-	table.insert(stored_pins, cur_pinned_buf_data)
+	local stored_pins = pin_storage_entry.stored_pins
+	local index = hbac_storage_utils.file_is_in_stored_pins(stored_pins, cur_pinned_buf_data)
+	local warn_msg = (
+		"Pin storage: '"
+		.. keyname
+		.. ((add and "' already contains ") or (remove and "' does not contain "))
+		.. "this file:\n\n"
+		.. cur_pinned_buf_data.abs_path
+	)
+	if (add and index) or (remove and not index) then
+		hbac_notify(warn_msg, "warn")
+		return
+	end
+	if add then
+		table.insert(stored_pins, cur_pinned_buf_data)
+	elseif remove then
+		table.remove(stored_pins, index)
+	end
 	pin_storage_file_path:write(vim.fn.json_encode(pin_storage), "w")
-	hbac_notify("Pin storage: " .. cur_pinned_buf_data.filename .. " added to '" .. keyname .. "'")
+	local to_or_from = (add and "added to" or (remove and "removed from"))
+	hbac_notify("Pin storage: " .. cur_pinned_buf_data.filename .. " " .. to_or_from .. " '" .. keyname .. "'")
+end
+
+M.add_cur_buf_to_entry = function(keyname)
+	add_or_remove_file_in_entry(keyname, "add")
+end
+
+M.remove_cur_buf_from_entry = function(keyname)
+	add_or_remove_file_in_entry(keyname, "remove")
 end
 
 return M
