@@ -1,11 +1,20 @@
 local hbac_storage = require("hbac.storage")
 local hbac_storage_utils = require("hbac.storage.utils")
 local hbac_telescope_utils = require("hbac.telescope.telescope_utils")
+local execute_telescope_action = hbac_telescope_utils.execute_telescope_action
+local refresh_picker = hbac_telescope_utils.refresh_picker
+
+local action_state = require("telescope.actions.state")
 local finders = require("telescope.finders")
 local pickers = require("telescope.pickers")
 local entry_display = require("telescope.pickers.entry_display")
 local previewers = require("telescope.previewers")
 local sorters = require("telescope.sorters")
+
+-- TODO: the way to get this should be a function from storage utils
+local Path = require("plenary.path")
+local data_dir = vim.fn.stdpath("data")
+local pin_storage_file_path = Path:new(data_dir, "pin_storage.json")
 
 local M = {}
 
@@ -75,6 +84,19 @@ M.preview_pin_storage_entry = function(keyname)
 		require("hbac.telescope.storage_picker").storage_picker()
 	end
 
+	local hbac_remove_file_from_entry = function(prompt_bufnr)
+		local picker = action_state.get_current_picker(prompt_bufnr)
+		local pin_storage = hbac_storage.get_pin_storage() or {}
+		local pin_storage_entry = pin_storage[keyname]
+		local stored_pins = pin_storage_entry.stored_pins
+		local function remove_item_from_stored_pins(index)
+			table.remove(stored_pins, index)
+		end
+		execute_telescope_action(picker, remove_item_from_stored_pins, "index")
+		pin_storage_file_path:write(vim.fn.json_encode(pin_storage), "w")
+		refresh_picker(picker, make_finder, keyname)
+	end
+
 	pickers
 		.new({}, {
 			prompt_title = "Hbac Stored Pins Preview",
@@ -83,6 +105,7 @@ M.preview_pin_storage_entry = function(keyname)
 			previewer = previewers.vim_buffer_cat.new({}),
 			attach_mappings = function(_, map)
 				map("i", "<Esc>", hbac_recall_storage_picker)
+				map("i", "<M-x>", hbac_remove_file_from_entry)
 				return true
 			end,
 		})

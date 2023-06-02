@@ -1,3 +1,4 @@
+local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 local Path = require("plenary.path")
 local cwd = vim.loop.cwd()
@@ -23,23 +24,31 @@ M.check_dependencies = function()
 	return true
 end
 
-M.refresh_picker = function(picker, make_finder)
+M.refresh_picker = function(picker, make_finder, make_finder_arg)
 	local row = picker:get_selection_row()
+	local num_results = picker.manager:num_results()
 	picker:register_completion_callback(function()
-		picker:set_selection(row)
+    if row == num_results - 1 then
+      row = row - 1
+      local prompt_bufnr = vim.api.nvim_get_current_buf()  -- NOTE unsure if this is consistent
+      actions.move_to_bottom(prompt_bufnr)
+    else
+      picker:set_selection(row)
+    end
 	end)
-	picker:refresh(make_finder(), { reset_prompt = false })
+	picker:refresh(make_finder(make_finder_arg), { reset_prompt = false })
 end
 
-M.execute_telescope_action = function(picker, action)
+M.execute_telescope_action = function(picker, action, entry_field)
+	entry_field = entry_field or "value"
 	local multi_selection = picker:get_multi_selection()
 	if next(multi_selection) then
 		for _, entry in ipairs(multi_selection) do
-			action(entry.value)
+			action(entry[entry_field])
 		end
 	else
 		local single_selection = action_state.get_selected_entry()
-		action(single_selection.value)
+		action(single_selection[entry_field])
 	end
 end
 
