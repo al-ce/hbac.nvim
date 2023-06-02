@@ -3,6 +3,7 @@ local hbac_telescope_utils = require("hbac.telescope.telescope_utils")
 local refresh_picker = hbac_telescope_utils.refresh_picker
 local json_encode_pin_storage = hbac_storage_utils.json_encode_pin_storage
 
+local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 local finders = require("telescope.finders")
 local pickers = require("telescope.pickers")
@@ -103,6 +104,10 @@ local hbac_remove_files_from_entry = function(prompt_bufnr)
 
 	remove_items_from_stored_pins()
 	json_encode_pin_storage(pin_storage)
+	if #pin_storage_entry.stored_pins == 0 then
+    actions.close(prompt_bufnr)
+		return
+	end
 	refresh_picker(picker, make_finder, keyname)
 end
 
