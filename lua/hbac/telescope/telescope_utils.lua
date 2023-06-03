@@ -24,7 +24,7 @@ M.check_dependencies = function()
 	return true
 end
 
-M.refresh_picker = function(picker, make_finder, make_finder_arg)
+M.refresh_picker = function(picker, make_finder, finder_opts)
 	local row = picker:get_selection_row()
 	local num_results = picker.manager:num_results()
 	picker:register_completion_callback(function()
@@ -36,7 +36,7 @@ M.refresh_picker = function(picker, make_finder, make_finder_arg)
       picker:set_selection(row)
     end
 	end)
-	picker:refresh(make_finder(make_finder_arg), { reset_prompt = false })
+	picker:refresh(make_finder(finder_opts), { reset_prompt = false })
 end
 
 M.execute_telescope_action = function(picker, action, entry_field)

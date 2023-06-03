@@ -39,8 +39,9 @@ local function display(pin)
 	})
 end
 
-local function get_entries(keyname)
+local function get_entries(opts)
 	local entries = {}
+	local keyname = opts.keyname
 	local pin_storage = hbac_storage_utils.get_pin_storage() or {}
 	if not hbac_storage_utils.general_storage_checks(pin_storage, keyname) then
 		return
@@ -55,12 +56,13 @@ local function get_entries(keyname)
 			ordinal = pin.abs_path,
 		})
 	end
+	-- TODO: sort entries by some opts?
 	return entries
 end
 
-local function make_finder(keyname)
+local function make_finder(opts)
 	return finders.new_table({
-		results = get_entries(keyname),
+		results = get_entries(opts),
 		entry_maker = function(entry)
 			return {
 				filename = entry.filename,
@@ -75,7 +77,7 @@ end
 local hbac_remove_files_from_entry = function(prompt_bufnr)
 	local picker = action_state.get_current_picker(prompt_bufnr)
 	local pin_storage = hbac_storage_utils.get_pin_storage() or {}
-	local keyname = M.entry_keyname
+	local keyname = M.opts.keyname
 	local pin_storage_entry = pin_storage[keyname]
 	local stored_pins = pin_storage_entry.stored_pins
 
@@ -105,23 +107,25 @@ local hbac_remove_files_from_entry = function(prompt_bufnr)
 	remove_items_from_stored_pins()
 	json_encode_pin_storage(pin_storage)
 	if #pin_storage_entry.stored_pins == 0 then
-    actions.close(prompt_bufnr)
+		actions.close(prompt_bufnr)
 		return
 	end
-	refresh_picker(picker, make_finder, keyname)
+	refresh_picker(picker, make_finder, M.opts)
 end
 
 M.preview_pin_storage_entry = function(keyname)
-	M.entry_keyname = keyname
+	M.opts = M.opts or {}
+	M.opts.keyname = keyname
+	local opts = M.opts
 
 	local function hbac_recall_storage_picker()
 		require("hbac.telescope.storage_picker").storage_picker()
 	end
 
 	pickers
-		.new({}, {
+		.new(opts, {
 			prompt_title = "Hbac Stored Pins Preview",
-			finder = make_finder(keyname),
+			finder = make_finder(opts),
 			sorter = sorters.get_generic_fuzzy_sorter(),
 			previewer = previewers.vim_buffer_cat.new({}),
 			attach_mappings = function(_, map)

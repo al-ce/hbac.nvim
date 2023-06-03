@@ -1,5 +1,6 @@
 local hbac_config = require("hbac.setup").opts
 local hbac_storage_utils = require("hbac.storage.utils")
+local hbac_utils = require("hbac.utils")
 local hbac_notify = require("hbac.utils").hbac_notify
 local json_encode_pin_storage = hbac_storage_utils.json_encode_pin_storage
 local get_pin_storage = hbac_storage_utils.get_pin_storage
@@ -83,14 +84,14 @@ end
 
 local function add_or_remove_file_in_entry(keyname, add_or_remove)
 	local add, remove = add_or_remove == "add", add_or_remove == "remove"
-	local cur_bufnr = require("hbac.telescope.storage_picker").cur_bufnr
-	cur_bufnr = cur_bufnr or vim.api.nvim_get_current_buf()
+  local bufnrs = hbac_utils.get_listed_buffers()
+	local most_recent_buf = hbac_utils.most_recent_buf(bufnrs)
 	local pin_storage = get_pin_storage() or {}
 	local pin_storage_entry = pin_storage[keyname]
 	if not hbac_storage_utils.general_storage_checks(pin_storage, keyname) then
 		return
 	end
-	local cur_pinned_buf_data = hbac_storage_utils.get_single_pinned_buf_data(cur_bufnr)
+	local cur_pinned_buf_data = hbac_storage_utils.get_single_pinned_buf_data(most_recent_buf)
 	if not cur_pinned_buf_data then
 		hbac_notify("Pin storage: No file found for current buffer", "warn")
 		return

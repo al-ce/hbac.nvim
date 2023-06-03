@@ -14,11 +14,10 @@ M.storage_picker = function(opts)
 	opts = opts or {}
 	local finder = require("hbac.telescope.storage_picker.make_finder")
 	local previewer = require("hbac.telescope.storage_picker.previewer")
-	M.cur_bufnr = vim.api.nvim_get_current_buf()
 	pickers
 		.new(opts, {
 			prompt_title = "Hbac: Stored Pins",
-			finder = finder.make_finder(),
+			finder = finder.make_finder(opts),
 			previewer = previewer.previewer(),
 			sorter = conf.generic_sorter(opts),
 			attach_mappings = attach_mappings.attach_mappings,

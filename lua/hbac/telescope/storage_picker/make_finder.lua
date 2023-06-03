@@ -4,7 +4,8 @@ local hbac_storage_utils = require("hbac.storage.utils")
 
 local M = {}
 
-M.make_finder = function()
+M.make_finder = function(opts)
+	M.finder_opts = opts
 	local pin_storage = hbac_storage_utils.get_pin_storage() or {}
 
 	local function get_pin_count(pin_session)

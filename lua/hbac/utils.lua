@@ -21,6 +21,19 @@ M.get_listed_buffers = function()
 	end, vim.api.nvim_list_bufs())
 end
 
+M.most_recent_buf = function(bufnrs)
+	local most_recently_used = -1
+	local most_recently_used_bufnr = nil
+	for _, bufnr in ipairs(bufnrs) do
+		local lastused = vim.fn.getbufinfo(bufnr)[1].lastused
+		if lastused > most_recently_used then
+			most_recently_used = lastused
+			most_recently_used_bufnr = bufnr
+		end
+	end
+	return most_recently_used_bufnr
+end
+
 M.hbac_notify = function(message, level)
 	local config = require("hbac.setup").opts
 	if config.notify then

@@ -47,9 +47,10 @@ end
 
 local hbac_add_cur_buf_to_entry = function(prompt_bufnr)
 	local picker = action_state.get_current_picker(prompt_bufnr)
-	execute_telescope_action(picker, pin_storage.add_cur_buf_to_entry)
 	local make_finder = require("hbac.telescope.storage_picker.make_finder")
-	hbac_telescope_utils.refresh_picker(picker, make_finder.make_finder)
+	local finder_opts = make_finder.finder_opts
+	execute_telescope_action(picker, pin_storage.add_cur_buf_to_entry)
+	hbac_telescope_utils.refresh_picker(picker, make_finder.make_finder, finder_opts)
 end
 
 M.attach_mappings = function(_, map)
