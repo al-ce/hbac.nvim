@@ -1,3 +1,4 @@
+local hbac_utils = require("hbac.utils")
 local hbac_storage_utils = require("hbac.storage.utils")
 local hbac_telescope_utils = require("hbac.telescope.telescope_utils")
 local refresh_picker = hbac_telescope_utils.refresh_picker
@@ -13,29 +14,23 @@ local sorters = require("telescope.sorters")
 
 local M = {}
 
-local function display(pin)
-	local function get_display_text()
-		local display_path = hbac_telescope_utils.format_filepath(pin.abs_path)
-		if display_path == "" then
-			return pin.filename
-		end
-		return pin.filename .. " (" .. display_path .. ")"
-	end
-
+local function display(entry)
+	local abs_path = entry.value.abs_path
 	local displayer = entry_display.create({
 		separator = " ",
 		items = {
+			{ width = 2 },
 			{ width = 2 },
 			{ remaining = true },
 		},
 	})
 
-	local icon, hl_group = hbac_telescope_utils.get_devicon(pin.abs_path)
-
-	-- BUG: hl_group is returning correctly but not highlighting for this picker
+	local listed_bufs_pinned_states = hbac_utils.get_listed_bufs_pinned_states()
+	local icon, hl_group = hbac_telescope_utils.get_devicon(abs_path)
 	return displayer({
+		{ hbac_telescope_utils.get_pinned_state_icon(abs_path, listed_bufs_pinned_states) },
 		{ icon, hl_group },
-		get_display_text(),
+		hbac_telescope_utils.get_display_text(abs_path),
 	})
 end
 
@@ -51,7 +46,7 @@ local function get_entries(opts)
 	for _, pin in pairs(stored_pins) do
 		table.insert(entries, {
 			filename = pin.abs_path,
-			display = display(pin),
+			display = display,
 			value = pin,
 			ordinal = pin.abs_path,
 		})

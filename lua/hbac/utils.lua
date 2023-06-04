@@ -21,6 +21,21 @@ M.get_listed_buffers = function()
 	end, vim.api.nvim_list_bufs())
 end
 
+M.get_listed_bufs_pinned_states = function()
+	local listed_bufs_pinned_states = {}
+	local listed_bufnrs = M.get_listed_buffers()
+	local pinned_buffers = state.pinned_buffers
+	for _, bufnr in ipairs(listed_bufnrs) do
+		local fullpath = vim.fn.expand("#" .. tostring(bufnr) .. ":p")
+		local is_pinned = pinned_buffers[bufnr] == true
+		listed_bufs_pinned_states[fullpath] = {
+			bufnr = bufnr,
+			is_pinned = is_pinned,
+		}
+	end
+	return listed_bufs_pinned_states
+end
+
 M.most_recent_buf = function(bufnrs)
 	local most_recently_used = -1
 	local most_recently_used_bufnr = nil
@@ -32,6 +47,15 @@ M.most_recent_buf = function(bufnrs)
 		end
 	end
 	return most_recently_used_bufnr
+end
+
+M.get_pin_icon = function(bufnr)
+	local hbac_config = require("hbac.setup").opts
+	local pin_icons = hbac_config.telescope.pin_picker.pin_icons
+	local is_pinned = state.is_pinned(bufnr)
+	local pin_icon = is_pinned and pin_icons.pinned[1] or pin_icons.unpinned[1]
+	local pin_icon_hl = is_pinned and pin_icons.pinned.hl or pin_icons.unpinned.hl
+	return pin_icon, pin_icon_hl
 end
 
 M.hbac_notify = function(message, level)

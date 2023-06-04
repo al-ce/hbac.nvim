@@ -1,31 +1,11 @@
-local hbac_config = require("hbac.setup").opts
-local state = require("hbac.state")
+local hbac_utils = require("hbac.utils")
 local hbac_telescope_utils = require("hbac.telescope.telescope_utils")
-
 local entry_display = require("telescope.pickers.entry_display")
 
 local M = {}
 
 M.display = function(entry)
 	local bufnr, bufname = entry.value, entry.ordinal
-
-	local function get_pin_icon()
-		local pin_icons = hbac_config.telescope.pin_picker.pin_icons
-		local is_pinned = state.is_pinned(bufnr)
-		local pin_icon = is_pinned and pin_icons.pinned[1] or pin_icons.unpinned[1]
-		local pin_icon_hl = is_pinned and pin_icons.pinned.hl or pin_icons.unpinned.hl
-		return pin_icon, pin_icon_hl
-	end
-
-	local function get_display_text()
-		local bufpath = hbac_telescope_utils.format_filepath(bufname)
-		local display_filename = vim.fn.fnamemodify(bufname, ":t")
-		if bufpath == "" then
-			return display_filename
-		end
-		return display_filename .. " (" .. bufpath .. ")"
-	end
-
 	local displayer = entry_display.create({
 		separator = " ",
 		items = {
@@ -36,9 +16,9 @@ M.display = function(entry)
 	})
 
 	return displayer({
-		{ get_pin_icon() },
+		{ hbac_utils.get_pin_icon(bufnr) },
 		{ hbac_telescope_utils.get_devicon(bufname) },
-		get_display_text(),
+		hbac_telescope_utils.get_display_text(bufname),
 	})
 end
 

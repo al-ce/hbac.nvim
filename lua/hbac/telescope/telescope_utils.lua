@@ -28,13 +28,13 @@ M.refresh_picker = function(picker, make_finder, finder_opts)
 	local row = picker:get_selection_row()
 	local num_results = picker.manager:num_results()
 	picker:register_completion_callback(function()
-    if row == num_results - 1 then
-      row = row - 1
-      local prompt_bufnr = vim.api.nvim_get_current_buf()  -- NOTE unsure if this is consistent
-      actions.move_to_bottom(prompt_bufnr)
-    else
-      picker:set_selection(row)
-    end
+		if row == num_results - 1 then
+			row = row - 1
+			local prompt_bufnr = vim.api.nvim_get_current_buf() -- NOTE unsure if this is consistent
+			actions.move_to_bottom(prompt_bufnr)
+		else
+			picker:set_selection(row)
+		end
 	end)
 	picker:refresh(make_finder(finder_opts), { reset_prompt = false })
 end
@@ -62,10 +62,28 @@ M.format_filepath = function(bufname)
 	return path
 end
 
+M.get_display_text = function(filepath)
+	local bufpath = M.format_filepath(filepath)
+	local display_filename = vim.fn.fnamemodify(filepath, ":t")
+	if bufpath == "" then
+		return display_filename
+	end
+	return display_filename .. " (" .. bufpath .. ")"
+end
+
+M.get_pinned_state_icon = function(abs_path, listed_bufs_pinned_states)
+	local hbac_utils = require("hbac.utils")
+	local pinned_state = listed_bufs_pinned_states[abs_path]
+	if pinned_state == nil then
+		return " ", "Normal"
+	end
+	return hbac_utils.get_pin_icon(pinned_state.bufnr)
+end
+
 M.get_devicon = function(bufname)
 	local has_devicons, devicons = pcall(require, "nvim-web-devicons")
 	if not has_devicons then
-		return "", ""
+		return " ", ""
 	end
 	return devicons.get_icon(bufname, string.match(bufname, "%a+$"), { default = true })
 end
