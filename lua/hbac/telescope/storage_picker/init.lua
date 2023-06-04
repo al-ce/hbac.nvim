@@ -17,6 +17,7 @@ M.storage_picker = function(opts)
 	pickers
 		.new(opts, {
 			prompt_title = "Hbac: Stored Pins",
+      results_title = "Storage Entries",
 			finder = finder.make_finder(opts),
 			previewer = previewer.previewer(),
 			sorter = conf.generic_sorter(opts),

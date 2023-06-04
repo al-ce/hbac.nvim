@@ -120,6 +120,7 @@ M.preview_pin_storage_entry = function(keyname)
 	pickers
 		.new(opts, {
 			prompt_title = "Hbac Stored Pins Preview",
+			results_title = keyname,
 			finder = make_finder(opts),
 			sorter = sorters.get_generic_fuzzy_sorter(),
 			previewer = previewers.vim_buffer_cat.new({}),
