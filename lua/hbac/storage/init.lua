@@ -82,16 +82,14 @@ Type 'DELETE' to confirm or anything else to cancel: ]]
 	hbac_notify("Pin storage cleared", "warn")
 end
 
-local function add_or_remove_file_in_entry(keyname, add_or_remove)
+local function add_or_remove_file_in_entry(keyname, add_or_remove, bufnr)
 	local add, remove = add_or_remove == "add", add_or_remove == "remove"
-  local bufnrs = hbac_utils.get_listed_buffers()
-	local most_recent_buf = hbac_utils.most_recent_buf(bufnrs)
 	local pin_storage = get_pin_storage() or {}
 	local pin_storage_entry = pin_storage[keyname]
 	if not hbac_storage_utils.general_storage_checks(pin_storage, keyname) then
 		return
 	end
-	local cur_pinned_buf_data = hbac_storage_utils.get_single_pinned_buf_data(most_recent_buf)
+	local cur_pinned_buf_data = hbac_storage_utils.get_single_pinned_buf_data(bufnr)
 	if not cur_pinned_buf_data then
 		hbac_notify("Pin storage: No file found for current buffer", "warn")
 		return
@@ -119,12 +117,16 @@ local function add_or_remove_file_in_entry(keyname, add_or_remove)
 	hbac_notify("Pin storage: " .. cur_pinned_buf_data.filename .. " " .. to_or_from .. " '" .. keyname .. "'")
 end
 
-M.add_cur_buf_to_entry = function(keyname)
-	add_or_remove_file_in_entry(keyname, "add")
+M.add_buf_to_entry = function(keyname, bufnr)
+	if not bufnr then
+		local bufnrs = hbac_utils.get_listed_buffers()
+		bufnr = hbac_utils.most_recent_buf(bufnrs)
+	end
+	add_or_remove_file_in_entry(keyname, "add", bufnr)
 end
 
-M.remove_cur_buf_from_entry = function(keyname)
-	add_or_remove_file_in_entry(keyname, "remove")
+M.remove_buf_from_entry = function(keyname, bufnr)
+	add_or_remove_file_in_entry(keyname, "remove", bufnr)
 end
 
 return M

@@ -4,6 +4,7 @@ local subcommands = require("hbac.command.subcommands")
 local hbac_telescope_utils = require("hbac.telescope.telescope_utils")
 local hbac_utils = require("hbac.utils")
 local make_finder = require("hbac.telescope.pin_picker.make_finder")
+local pin_sorter = require("hbac.telescope.pin_picker.pin_sorter")
 
 local action_state = require("telescope.actions.state")
 
@@ -41,6 +42,7 @@ local function hbac_store_pinned_bufs(prompt_bufnr)
 	hbac_telescope_utils.execute_telescope_action(picker, store_pinned_bufs)
 	hbac_telescope_utils.refresh_picker(picker, make_finder.make_finder, finder_opts)
 end
+local hbac_add_buf_to_storage = pin_sorter.hbac_add_buf_to_storage
 
 M.attach_mappings = function(_, map)
 	local hbac_telescope_actions = {
@@ -50,6 +52,7 @@ M.attach_mappings = function(_, map)
 		unpin_all = hbac_unpin_all,
 		toggle_selections = hbac_toggle_selections,
 		store_pinned_bufs = hbac_store_pinned_bufs,
+		add_buf_to_storage = hbac_add_buf_to_storage,
 	}
 
 	for mode, hbac_cmds in pairs(hbac_config.telescope.pin_picker.mappings) do
