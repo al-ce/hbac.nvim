@@ -3,7 +3,7 @@ if not check_dependencies() then
 	return false
 end
 
-local conf = require("telescope.config").values
+local telescope_conf = require("telescope.config").values
 local pickers = require("telescope.pickers")
 
 local attach_mappings = require("hbac.telescope.storage_picker.attach_mappings")
@@ -20,7 +20,7 @@ M.storage_picker = function(opts)
       results_title = "Storage Entries",
 			finder = finder.make_finder(opts),
 			previewer = previewer.previewer(),
-			sorter = conf.generic_sorter(opts),
+			sorter = telescope_conf.generic_sorter(opts),
 			attach_mappings = attach_mappings.attach_mappings,
 		})
 		:find()

@@ -108,14 +108,14 @@ local hbac_remove_files_from_entry = function(prompt_bufnr)
 	refresh_picker(picker, make_finder, M.opts)
 end
 
+M.hbac_recall_storage_picker = function()
+	require("hbac.telescope.storage_picker").storage_picker()
+end
+
 M.preview_pin_storage_entry = function(keyname)
 	M.opts = M.opts or {}
 	M.opts.keyname = keyname
 	local opts = M.opts
-
-	local function hbac_recall_storage_picker()
-		require("hbac.telescope.storage_picker").storage_picker()
-	end
 
 	pickers
 		.new(opts, {
@@ -125,7 +125,7 @@ M.preview_pin_storage_entry = function(keyname)
 			sorter = sorters.get_generic_fuzzy_sorter(),
 			previewer = previewers.vim_buffer_cat.new({}),
 			attach_mappings = function(_, map)
-				map("i", "<Esc>", hbac_recall_storage_picker)
+				map("i", "<Esc>", M.hbac_recall_storage_picker)
 				map("i", "<M-x>", hbac_remove_files_from_entry)
 				return true
 			end,

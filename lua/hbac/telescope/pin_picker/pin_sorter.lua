@@ -55,7 +55,7 @@ M.hbac_add_buf_to_storage = function(prompt_bufnr)
 
 	execute_telescope_action(picker, insert_into_selected_buffers)
 	local hbac_pin_sorter = function()
-    local opts = M.pin_sorter_opts
+		local opts = M.pin_sorter_opts
 		require("hbac.telescope.storage_picker").storage_picker(opts)
 	end
 	hbac_pin_sorter()

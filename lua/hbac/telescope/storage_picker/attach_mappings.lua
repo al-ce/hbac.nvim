@@ -15,7 +15,7 @@ local function storage_picker_action(prompt_bufnr, action)
 end
 
 local function hbac_open_stored_pins(prompt_bufnr)
-	local open_stored_pins = pin_storage.open_pin_storage_entry
+	local open_stored_pins = pin_storage.exec_command_on_storage_entry
 	storage_picker_action(prompt_bufnr, open_stored_pins)
 end
 
@@ -53,6 +53,11 @@ local hbac_add_cur_buf_to_entry = function(prompt_bufnr)
 	hbac_telescope_utils.refresh_picker(picker, make_finder.make_finder, finder_opts)
 end
 
+local hbac_exec_command_on_pins = function(prompt_bufnr)
+	local commands_picker = require("hbac.telescope.command_picker").exec_command_on_pins
+	storage_picker_action(prompt_bufnr, commands_picker)
+end
+
 M.attach_mappings = function(_, map)
 	local hbac_storage_picker_actions = {
 		open_stored_pins = hbac_open_stored_pins,
@@ -62,6 +67,7 @@ M.attach_mappings = function(_, map)
 		preview_stored_pins = hbac_preview_stored_pins,
 		update_stored_pins = hbac_update_stored_pins,
 		add_cur_buf_to_entry = hbac_add_cur_buf_to_entry,
+		exec_command_on_pins = hbac_exec_command_on_pins,
 	}
 
 	for mode, hbac_cmds in pairs(hbac_config.telescope.storage_picker.mappings) do

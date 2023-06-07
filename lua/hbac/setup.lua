@@ -11,17 +11,17 @@ local M = {
 		notify = true,
 		storage = {
 			open = {
-				prehook = function()
+				prehook = function(keyname)
 					-- local close_unpinned = require("hbac.command.subcommands").close_unpinned
 					-- close_unpinned()
 					-- vim.cmd("tabnew")
 				end,
-				on_open = function(pin)
+				command = function(pin)
 					vim.cmd("e " .. pin.abs_path)
 					local bufnr = vim.fn.bufnr()
 					state.pinned_buffers[bufnr] = true
 				end,
-				posthook = function() end,
+				posthook = function(keyname) end,
 			},
 		},
 		telescope = {
@@ -60,7 +60,8 @@ local M = {
 						clear_pin_storage = "<M-d>",
 						preview_stored_pins = "<C-p>",
 						update_stored_pins = "<M-u>",
-            add_cur_buf_to_entry = "<M-b>"
+						add_cur_buf_to_entry = "<M-b>",
+						exec_command_on_pins = "<M-e>",
 					},
 					i = {
 						open_stored_pins = "<CR>",
@@ -69,7 +70,8 @@ local M = {
 						clear_pin_storage = "<M-d>",
 						preview_stored_pins = "<C-p>",
 						update_stored_pins = "<M-u>",
-            add_cur_buf_to_entry = "<M-b>"
+						add_cur_buf_to_entry = "<M-b>",
+						exec_command_on_pins = "<M-e>",
 					},
 				},
 			},

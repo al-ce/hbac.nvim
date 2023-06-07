@@ -55,13 +55,14 @@ local opts = {
     open = {
       fill_windows = true,  -- set to true to spread the stored pins across windows when opening
       prehook = function() end, -- called before any stored pins are opened
-      on_open = function(pin) -- this is called on each item in storage while iterating
+      command = function(pin) -- this is called on each item in storage while iterating
         vim.cmd("e " .. pin.abs_path)
         local bufnr = vim.fn.bufnr()
         require("hbac.state").pinned_buffers[bufnr] = true  -- used to prevent autoclose from closing the buffer
       end,
       posthook = function() end,  -- called after all stored pins are opened
     },
+    -- add custom commands with similar pre/posthook + command structure
   },
   telescope = {
     pin_picker = {
@@ -73,6 +74,7 @@ local opts = {
           unpin_all = "<M-u>",
           toggle_selections = "<M-y>",
           store_pinned_bufs = "<M-s>",
+          add_buf_to_storage = "<M-b>",
         },
         i = {
           -- as above
@@ -94,6 +96,7 @@ local opts = {
           preview_stored_pins = "<C-p>",
           update_stored_pins = "<M-u>",
           add_cur_buf_to_entry = "<M-b>",
+          exec_command_on_pins = "<M-e>",
         },
         i = {
           -- as above
@@ -150,6 +153,7 @@ Views and manage the pin states of buffers. The picker provides the following ac
 - `hbac_close_unpinned` - close all unpinned buffers. Default `<M-c>`
 - `hbac_delete_buffer` - delete the selected buffers with the function set in `opts.close_command` (`nvim_buf_delete` by default`). Default `<M-x>`
 - `hbac_store_pinned_bufs` - store the currently pinned buffers in a JSON file. See section below for details. Default `<M-s>`
+- `hbac_add_buf_to_storage` - add the current buffer to a stored entry by selecting the entry from a new picker. Default `<M-b>`
 
 You can also call the picker function directly and pass a table of options (see `:h telescope.setup()` for valid option keys):
 
@@ -180,38 +184,46 @@ The storage picker provides the following actions:
 - `hbac_preview_stored_pins` - open a new picker to preview the selected set of stored pins. `<Esc>` will close the previewer and return to the storage picker. The results from this picker can be sent to the quickfix list or a trouble window. Default `<C-p>`
 - `hbac_update_stored_pins` - update the selected stored pins entry with the currently pinned buffers. Default `<M-u>`.
 - `hbac_add_cur_buf_to_entry` - add the current buffer to the selected storage entries. Default `<M-b>`
+- `hbac_exec_command_on_pins` - execute a command on the selected stored pins entries by selecting the command from a new picker. Default `<M-e>`
 
 Note that most of these actions are exposed functions in the `hbac.storage` module and can be called directly, but the storage picker makes it easy to handle all these actions.
 
 https://github.com/al-ce/hbac.nvim/assets/23170004/17948123-2f2d-4070-89b7-334fcff656e6
 
-## Pre- / Posthook, on_open functions
+## Pre- / Posthook, command functions
 
-You can define pre- and posthooks for the `open` action in the `storage` option table. These hooks are called before and after the stored pins are opened. You can use them to close unpinned buffers, open a new tab, or whatever you like.
+You can define pre- and posthooks for a custom action in the `storage` option table. These hooks are called before and after the stored pins are opened. You can use them to close unpinned buffers, open a new tab, or whatever you like.
 
-The `on_open` function is called during the loop that iterates over the stored pins in an entry. It is called after the prehook and before the posthook. The default is to simply open the file and pin its buffer.
+The `command` function is called during the loop that iterates over the stored pins in an entry. It is called after the prehook and before the posthook. The default is to simply open the file and pin its buffer.
 
 Here are some minor changes to the defaults that you might find useful:
 
 ```lua
 require("hbac").setup({
   storage = {
-    open = {
-      prehook = function()
+    open = {  -- override the default open command
+      prehook = function(keyname)  -- can pass the keyname of the storage entry
         vim.cmd("Hbac close_unpinned")
         vim.cmd("tabnew")
       end,
 
-      on_open = function(pin)
+      command = function(pin)
         vim.cmd("e " .. pin.abs_path)
         local bufnr = vim.fn.bufnr()
         require("hbac.state").pinned_buffers[bufnr] = true
       end,
 
-      posthook = function()
+      posthook = function(keyname)
         vim.cmd("Hbac pin_picker")
       end,
     },
+    log_file_paths = {
+      -- note that the pre/post hooks are optional, but command is required
+      command = function(pin)
+        vim.cmd("!echo '" .. pin.abs_path .. "' >> ~/tmp/my_paths.log")
+      end,
+    },
+
   },
 })
 ```

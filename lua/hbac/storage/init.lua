@@ -42,19 +42,33 @@ M.delete_pin_storage_entry = function(keyname)
 	hbac_notify("Pin storage: '" .. keyname .. "' deleted", "warn")
 end
 
-M.open_pin_storage_entry = function(keyname)
+M.exec_command_on_storage_entry = function(keyname, command)
 	local pin_storage = get_pin_storage() or {}
 	if not hbac_storage_utils.general_storage_checks(pin_storage, keyname) then
 		return
 	end
-	hbac_config.storage.open.prehook()
-	local entry = pin_storage[keyname]
-	local stored_pins = entry.stored_pins
-	for _, pin in pairs(stored_pins) do
-		hbac_config.storage.open.on_open(pin)
+	command = command or "open"
+	local command_config = hbac_config.storage[command]
+	if command_config == nil then
+		hbac_notify("Pin storage: command '" .. command .. "' not found", "warn")
+		return
 	end
-	hbac_config.storage.open.posthook()
-	hbac_notify("Pin storage: '" .. keyname .. "' opened")
+	local prehook = command_config.prehook
+	if prehook then
+		prehook(keyname)
+	end
+	if command_config.command then
+		local storage_entry = pin_storage[keyname]
+		local stored_pins = storage_entry.stored_pins
+		for _, pin in pairs(stored_pins) do
+			command_config.command(pin)
+		end
+	end
+	local posthook = command_config.posthook
+	if posthook then
+		posthook(keyname)
+	end
+	hbac_notify("Pin storage: ran command '" .. command .. "' on '" .. keyname .. "'")
 end
 
 M.rename_pin_storage_entry = function(keyname)
