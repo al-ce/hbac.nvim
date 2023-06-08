@@ -32,13 +32,13 @@ local M = {
 		notify = true,
 		storage = {
 			open = {
-				prehook = function() end,
+				-- prehook = function() end,
 				command = function(pin)
 					vim.cmd("e " .. pin.abs_path)
 					local bufnr = vim.fn.bufnr()
 					hbac_state.pinned_buffers[bufnr] = true
 				end,
-				posthook = function() end,
+				-- posthook = function() end,
 			},
 		},
 		telescope = {

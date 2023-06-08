@@ -37,7 +37,6 @@ M.make_finder = function(opts)
 						proj_root,
 					})
 				end,
-				-- TODO: sort by timestamp
 				ordinal = entry,
 				stored_pins = pin_session.stored_pins,
 				timestamp = pin_session.timestamp,

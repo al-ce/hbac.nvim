@@ -7,7 +7,6 @@ M.make_finder = function(opts)
 	M.finder_opts = opts
 	local hbac_config = require("hbac.setup").opts
 	local displayer = entry_display.create({
-		separator = " ",
 		items = {
 			{ remaining = true },
 		},

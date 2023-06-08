@@ -7,11 +7,14 @@ local M = {}
 M.filter_bufnrs_by_opts = function(opts, bufnrs)
 	local filter = vim.tbl_filter
 	bufnrs = filter(function(b)
+		local function buf_in_cwd(cwd)
+			return string.find(vim.api.nvim_buf_get_name(b), cwd, 1, true)
+		end
 		if
 			(opts.show_all_buffers == false and not vim.api.nvim_buf_is_loaded(b))
 			or (opts.ignore_current_buffer and b == hbac_utils.most_recent_buf(bufnrs))
-			or (opts.cwd_only and not string.find(vim.api.nvim_buf_get_name(b), vim.loop.cwd(), 1, true))
-			or (opts.cwd_only and opts.cwd and not string.find(vim.api.nvim_buf_get_name(b), opts.cwd, 1, true))
+			or (opts.cwd_only and not buf_in_cwd(vim.loop.cwd()))
+			or (not opts.cwd_only and opts.cwd and not buf_in_cwd(opts.cwd))
 		then
 			return false
 		end

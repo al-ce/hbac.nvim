@@ -72,11 +72,11 @@ M.get_display_text = function(filepath)
 end
 
 M.get_pinned_state_icon = function(abs_path, listed_bufs_pinned_states)
-	local hbac_utils = require("hbac.utils")
 	local pinned_state = listed_bufs_pinned_states[abs_path]
 	if pinned_state == nil then
 		return " ", "Normal"
 	end
+	local hbac_utils = require("hbac.utils")
 	return hbac_utils.get_pin_icon(pinned_state.bufnr)
 end
 

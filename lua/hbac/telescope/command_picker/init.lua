@@ -32,7 +32,7 @@ M.exec_command_on_pins = function(storage_entry_keyname)
 			layout_strategy = "horizontal",
 			layout_config = {
 				height = 0.2,
-				width = 0.2,
+				width = 0.3,
 			},
 			borderchars = {
 				{ "─", "│", "─", "│", "┌", "┐", "┘", "└" },
