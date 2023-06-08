@@ -76,7 +76,6 @@ M.setup = function(user_opts)
 		callback = function()
 			vim.api.nvim_create_autocmd({ "InsertEnter", "BufModifiedSet" }, {
 				buffer = 0,
-				once = true,
 				callback = function()
 					local bufnr = vim.api.nvim_get_current_buf()
 					if hbac_state.is_pinned(bufnr) then
