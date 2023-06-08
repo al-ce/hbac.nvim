@@ -17,6 +17,7 @@ M.get_pin_storage = function()
 	local content = pin_storage_file_path:read()
 	return vim.fn.json_decode(content)
 end
+
 M.json_encode_pin_storage = function(pin_storage)
 	for entry, storage_info in pairs(pin_storage) do
 		local stored_pins = storage_info.stored_pins

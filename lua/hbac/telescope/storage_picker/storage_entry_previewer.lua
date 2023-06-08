@@ -99,6 +99,7 @@ local hbac_remove_files_from_entry = function(prompt_bufnr)
 		end
 	end
 
+	pin_storage_entry.timestamp = os.date("%Y-%m-%d %H:%M:%S")
 	remove_items_from_stored_pins()
 	json_encode_pin_storage(pin_storage)
 	if #pin_storage_entry.stored_pins == 0 then

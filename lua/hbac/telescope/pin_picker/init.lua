@@ -15,7 +15,7 @@ M.pin_picker = function(opts)
 	pickers
 		.new(opts, {
 			prompt_title = "Hbac Pin States",
-      results_title = "Buffers",
+			results_title = "Buffers",
 			finder = make_finder.make_finder(opts),
 			sorter = telescope_conf.generic_sorter(opts),
 			attach_mappings = attach_mappings.attach_mappings,

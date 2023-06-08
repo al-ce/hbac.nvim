@@ -47,10 +47,11 @@ end
 
 local hbac_add_cur_buf_to_entry = function(prompt_bufnr)
 	local picker = action_state.get_current_picker(prompt_bufnr)
-	local make_finder = require("hbac.telescope.storage_picker.make_finder")
-	local finder_opts = make_finder.finder_opts
+	local storage_picker_make_finder = require("hbac.telescope.storage_picker.make_finder")
+	local finder_opts = storage_picker_make_finder.finder_opts
+	local make_finder = storage_picker_make_finder.make_finder
 	execute_telescope_action(picker, pin_storage.add_buf_to_entry)
-	hbac_telescope_utils.refresh_picker(picker, make_finder.make_finder, finder_opts)
+	picker:refresh(make_finder(finder_opts), { reset_prompt = false })
 end
 
 local hbac_exec_command_on_pins = function(prompt_bufnr)

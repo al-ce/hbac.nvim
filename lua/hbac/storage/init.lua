@@ -68,6 +68,9 @@ M.exec_command_on_storage_entry = function(keyname, command)
 	if posthook then
 		posthook(keyname)
 	end
+	local timestamp = os.date("%Y-%m-%d %H:%M:%S")
+	pin_storage[keyname].timestamp = timestamp
+	json_encode_pin_storage(pin_storage)
 	hbac_notify("Pin storage: ran command '" .. command .. "' on '" .. keyname .. "'")
 end
 
@@ -78,6 +81,7 @@ M.rename_pin_storage_entry = function(keyname)
 		return
 	end
 	pin_storage[new_keyname] = pin_storage[keyname]
+	pin_storage[new_keyname].timestamp = os.date("%Y-%m-%d %H:%M:%S")
 	pin_storage[keyname] = nil
 	json_encode_pin_storage(pin_storage)
 	hbac_notify("Pin storage: '" .. keyname .. "' renamed to '" .. new_keyname .. "'")
@@ -126,6 +130,8 @@ local function add_or_remove_file_in_entry(keyname, add_or_remove, bufnr)
 	elseif remove then
 		table.remove(stored_pins, index)
 	end
+	local timestamp = os.date("%Y-%m-%d %H:%M:%S")
+	pin_storage_entry.timestamp = timestamp
 	json_encode_pin_storage(pin_storage)
 	local to_or_from = (add and "added to" or (remove and "removed from"))
 	hbac_notify("Pin storage: " .. cur_pinned_buf_data.filename .. " " .. to_or_from .. " '" .. keyname .. "'")

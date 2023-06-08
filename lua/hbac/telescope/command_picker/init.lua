@@ -13,7 +13,9 @@ local M = {}
 
 local hbac_recall_storage_picker = hbac_storage_entry_previewer.hbac_recall_storage_picker
 
-local function hbac_exec_command_on_pins()
+local function hbac_exec_command_on_pins(prompt_bufnr)
+	local actions = require("telescope.actions")
+	actions.close(prompt_bufnr)
 	local command = action_state.get_selected_entry()
 	local open_pin_storage_entry = hbac_storage.exec_command_on_storage_entry
 	open_pin_storage_entry(M.storage_entry_keyname, command.value)
