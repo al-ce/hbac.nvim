@@ -1,6 +1,6 @@
 local M = {}
 
-local state = require("hbac.state")
+local hbac_state = require("hbac.state")
 local hbac_utils = require("hbac.utils")
 
 local CONSTANTS = {
@@ -10,9 +10,9 @@ local CONSTANTS = {
 M.autoclose = {}
 
 M.autoclose.setup = function()
-	local config = require("hbac.setup").opts
+	local hbac_config = require("hbac.setup").opts
 
-	state.autoclose_enabled = true
+	hbac_state.autoclose_enabled = true
 	vim.api.nvim_create_autocmd({ "BufEnter" }, {
 		group = vim.api.nvim_create_augroup(CONSTANTS.AUGROUP_AUTO_CLOSE, { clear = true }),
 		pattern = { "*" },
@@ -29,19 +29,19 @@ M.autoclose.setup = function()
 				return vim.api.nvim_buf_get_option(buf, "buflisted")
 			end, vim.api.nvim_list_bufs())
 			local num_buffers = #buffers
-			if num_buffers <= config.threshold then
+			if num_buffers <= hbac_config.threshold then
 				return
 			end
 
-			local buffers_to_close = num_buffers - config.threshold
+			local buffers_to_close = num_buffers - hbac_config.threshold
 
 			-- Buffer sorted by current > pinned > is_in_window > named > unnamed
 			table.sort(buffers, function(a, b)
 				if a == current_buf or b == current_buf then
 					return b == current_buf
 				end
-				if state.is_pinned(a) ~= state.is_pinned(b) then
-					return state.is_pinned(b)
+				if hbac_state.is_pinned(a) ~= hbac_state.is_pinned(b) then
+					return hbac_state.is_pinned(b)
 				end
 
 				local a_windowed = #(vim.fn.win_findbuf(a)) > 0
@@ -64,7 +64,7 @@ M.autoclose.setup = function()
 				if not hbac_utils.buf_autoclosable(buffer) then
 					break
 				else
-					config.close_command(buffer)
+					hbac_config.close_command(buffer)
 				end
 			end
 		end,

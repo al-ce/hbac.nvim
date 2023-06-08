@@ -1,6 +1,6 @@
 local hbac_config = require("hbac.setup").opts
 local hbac_notify = require("hbac.utils").hbac_notify
-local state = require("hbac.state")
+local hbac_state = require("hbac.state")
 local hbac_utils = require("hbac.utils")
 local hbac_telescope_utils = require("hbac.telescope.telescope_utils")
 
@@ -40,7 +40,7 @@ end
 
 M.get_pinned_bufnrs = function()
 	local pinned_buffnrs = vim.tbl_filter(function(bufnr)
-		return state.pinned_buffers[bufnr]
+		return hbac_state.pinned_buffers[bufnr]
 	end, hbac_utils.get_listed_buffers())
 	if #pinned_buffnrs == 0 then
 		hbac_notify("No pins to store", "warn")

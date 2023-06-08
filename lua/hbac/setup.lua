@@ -1,4 +1,25 @@
-local state = require("hbac.state")
+local hbac_state = require("hbac.state")
+
+local pin_picker_mappings = {
+	close_unpinned = "<M-c>",
+	delete_buffer = "<M-x>",
+	pin_all = "<M-a>",
+	unpin_all = "<M-u>",
+	toggle_selections = "<M-y>",
+	store_pinned_bufs = "<M-s>",
+	add_buf_to_storage = "<M-b>",
+}
+
+local storage_picker_mappings = {
+	open_stored_pins = "<CR>",
+	delete_stored_pins = "<M-x>",
+	rename_stored_pins = "<M-r>",
+	clear_pin_storage = "<M-d>",
+	preview_stored_pins = "<C-p>",
+	update_stored_pins = "<M-u>",
+	add_cur_buf_to_entry = "<M-b>",
+	exec_command_on_pins = "<M-e>",
+}
 
 local M = {
 	opts = {
@@ -11,40 +32,20 @@ local M = {
 		notify = true,
 		storage = {
 			open = {
-				prehook = function(keyname)
-					-- local close_unpinned = require("hbac.command.subcommands").close_unpinned
-					-- close_unpinned()
-					-- vim.cmd("tabnew")
-				end,
+				prehook = function() end,
 				command = function(pin)
 					vim.cmd("e " .. pin.abs_path)
 					local bufnr = vim.fn.bufnr()
-					state.pinned_buffers[bufnr] = true
+					hbac_state.pinned_buffers[bufnr] = true
 				end,
-				posthook = function(keyname) end,
+				posthook = function() end,
 			},
 		},
 		telescope = {
 			pin_picker = {
 				mappings = {
-					n = {
-						close_unpinned = "<M-c>",
-						delete_buffer = "<M-x>",
-						pin_all = "<M-a>",
-						unpin_all = "<M-u>",
-						toggle_selections = "<M-y>",
-						store_pinned_bufs = "<M-s>",
-						add_buf_to_storage = "<M-b>",
-					},
-					i = {
-						close_unpinned = "<M-c>",
-						delete_buffer = "<M-x>",
-						pin_all = "<M-a>",
-						unpin_all = "<M-u>",
-						toggle_selections = "<M-y>",
-						store_pinned_bufs = "<M-s>",
-						add_buf_to_storage = "<M-b>",
-					},
+					n = pin_picker_mappings,
+					i = pin_picker_mappings,
 				},
 				pin_icons = {
 					pinned = { "󰐃 ", hl = "DiagnosticOk" },
@@ -53,26 +54,8 @@ local M = {
 			},
 			storage_picker = {
 				mappings = {
-					n = {
-						open_stored_pins = "<CR>",
-						delete_stored_pins = "<M-x>",
-						rename_stored_pins = "<M-r>",
-						clear_pin_storage = "<M-d>",
-						preview_stored_pins = "<C-p>",
-						update_stored_pins = "<M-u>",
-						add_cur_buf_to_entry = "<M-b>",
-						exec_command_on_pins = "<M-e>",
-					},
-					i = {
-						open_stored_pins = "<CR>",
-						delete_stored_pins = "<M-x>",
-						rename_stored_pins = "<M-r>",
-						clear_pin_storage = "<M-d>",
-						preview_stored_pins = "<C-p>",
-						update_stored_pins = "<M-u>",
-						add_cur_buf_to_entry = "<M-b>",
-						exec_command_on_pins = "<M-e>",
-					},
+					n = storage_picker_mappings,
+					i = storage_picker_mappings,
 				},
 			},
 		},
@@ -96,10 +79,10 @@ M.setup = function(user_opts)
 				once = true,
 				callback = function()
 					local bufnr = vim.api.nvim_get_current_buf()
-					if state.is_pinned(bufnr) then
+					if hbac_state.is_pinned(bufnr) then
 						return
 					end
-					state.toggle_pin(bufnr)
+					hbac_state.toggle_pin(bufnr)
 				end,
 			})
 		end,

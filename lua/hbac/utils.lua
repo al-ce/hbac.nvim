@@ -1,15 +1,15 @@
-local state = require("hbac.state")
+local hbac_state = require("hbac.state")
 
 local M = {}
 
 M.buf_autoclosable = function(bufnr)
 	local current_buf = vim.api.nvim_get_current_buf()
-	if state.is_pinned(bufnr) or bufnr == current_buf then
+	if hbac_state.is_pinned(bufnr) or bufnr == current_buf then
 		return false
 	end
 	local buffer_windows = vim.fn.win_findbuf(bufnr)
-	local config = require("hbac.setup").opts
-	if #buffer_windows > 0 and not config.close_buffers_with_windows then
+	local hbac_config = require("hbac.setup").opts
+	if #buffer_windows > 0 and not hbac_config.close_buffers_with_windows then
 		return false
 	end
 	return true
@@ -24,7 +24,7 @@ end
 M.get_listed_bufs_pinned_states = function()
 	local listed_bufs_pinned_states = {}
 	local listed_bufnrs = M.get_listed_buffers()
-	local pinned_buffers = state.pinned_buffers
+	local pinned_buffers = hbac_state.pinned_buffers
 	for _, bufnr in ipairs(listed_bufnrs) do
 		local fullpath = vim.fn.expand("#" .. tostring(bufnr) .. ":p")
 		local is_pinned = pinned_buffers[bufnr] == true
@@ -52,22 +52,22 @@ end
 M.get_pin_icon = function(bufnr)
 	local hbac_config = require("hbac.setup").opts
 	local pin_icons = hbac_config.telescope.pin_picker.pin_icons
-	local is_pinned = state.is_pinned(bufnr)
+	local is_pinned = hbac_state.is_pinned(bufnr)
 	local pin_icon = is_pinned and pin_icons.pinned[1] or pin_icons.unpinned[1]
 	local pin_icon_hl = is_pinned and pin_icons.pinned.hl or pin_icons.unpinned.hl
 	return pin_icon, pin_icon_hl
 end
 
 M.hbac_notify = function(message, level)
-	local config = require("hbac.setup").opts
-	if config.notify then
+	local hbac_config = require("hbac.setup").opts
+	if hbac_config.notify then
 		vim.notify(message, level or "info", { title = "Hbac" })
 	end
 end
 
 M.set_notify = function(notify)
-	local config = require("hbac.setup").opts
-	config.notify = notify
+	local hbac_config = require("hbac.setup").opts
+	hbac_config.notify = notify
 end
 
 return M

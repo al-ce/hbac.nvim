@@ -1,5 +1,5 @@
 local hbac_config = require("hbac.setup").opts
-local state = require("hbac.state")
+local hbac_state = require("hbac.state")
 local subcommands = require("hbac.command.subcommands")
 local hbac_telescope_utils = require("hbac.telescope.telescope_utils")
 local hbac_utils = require("hbac.utils")
@@ -21,7 +21,7 @@ local function pin_picker_action(prompt_bufnr, action)
 end
 
 local function hbac_toggle_selections(prompt_bufnr)
-	pin_picker_action(prompt_bufnr, state.toggle_pin)
+	pin_picker_action(prompt_bufnr, hbac_state.toggle_pin)
 end
 local function hbac_pin_all(prompt_bufnr)
 	pin_picker_action(prompt_bufnr, subcommands.pin_all)
