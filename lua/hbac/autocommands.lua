@@ -24,11 +24,8 @@ M.autoclose.setup = function()
 				return
 			end
 
-			local buffers = vim.tbl_filter(function(buf)
-				-- Filter out buffers that are not listed
-				return vim.api.nvim_buf_get_option(buf, "buflisted")
-			end, vim.api.nvim_list_bufs())
-			local num_buffers = #buffers
+			local listed_bufs = hbac_utils.get_listed_buffers()
+			local num_buffers = #listed_bufs
 			if num_buffers <= hbac_config.threshold then
 				return
 			end
@@ -36,7 +33,7 @@ M.autoclose.setup = function()
 			local buffers_to_close = num_buffers - hbac_config.threshold
 
 			-- Buffer sorted by current > pinned > is_in_window > named > unnamed
-			table.sort(buffers, function(a, b)
+			table.sort(listed_bufs, function(a, b)
 				if a == current_buf or b == current_buf then
 					return b == current_buf
 				end
@@ -60,7 +57,7 @@ M.autoclose.setup = function()
 			end)
 
 			for i = 1, buffers_to_close, 1 do
-				local buffer = buffers[i]
+				local buffer = listed_bufs[i]
 				if not hbac_utils.buf_autoclosable(buffer) then
 					break
 				else
