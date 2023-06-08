@@ -53,7 +53,6 @@ local opts = {
   notify = true,  -- show or hide notifications on Hbac actions
   storage = {
     open = {
-      fill_windows = true,  -- set to true to spread the stored pins across windows when opening
       prehook = function() end, -- called before any stored pins are opened
       command = function(pin) -- this is called on each item in storage while iterating
         vim.cmd("e " .. pin.abs_path)
