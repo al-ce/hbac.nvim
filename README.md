@@ -180,19 +180,21 @@ The storage picker provides the following actions:
 - `hbac_delete_stored_pins` - delete the selected set of stored pins (with confirmation). Default `<M-x>`
 - `hbac_rename_stored_pins` - rename the selected set of stored pins. Default `<M-r>`
 - `hbac_clear_pin_storage` - delete all stored pins (with confirmation). Default `<M-d>`
-- `hbac_preview_stored_pins` - open a new picker to preview the selected set of stored pins. `<Esc>` will close the previewer and return to the storage picker. The results from this picker can be sent to the quickfix list or a trouble window. Default `<C-p>`
+- `hbac_preview_stored_pins` - open a new picker to preview the selected set of stored pins. `<Esc>` will close the previewer and return to the storage picker. `<CR>` will open the file being previewed. The results from this picker can be sent to the quickfix list or a trouble window with `<C-t>`. Default `<C-p>` to start the preview-picker.
 - `hbac_update_stored_pins` - update the selected stored pins entry with the currently pinned buffers. Default `<M-u>`.
 - `hbac_add_cur_buf_to_entry` - add the current buffer to the selected storage entries. Default `<M-b>`
 - `hbac_exec_command_on_pins` - execute a command over all the selected stored pin entries by selecting the command from a new picker. Default `<M-e>`
 
-Note that most of these actions are exposed functions in the `hbac.storage` module and can be called directly, but the storage picker makes it easy to handle all these actions.
+Note that most of these actions are exposed functions in the `hbac.storage` module and can be called directly, but the storage picker makes it easy to visualize them.
 
-https://github.com/al-ce/hbac.nvim/assets/23170004/17948123-2f2d-4070-89b7-334fcff656e6
+
+https://github.com/al-ce/hbac.nvim/assets/23170004/f090dc63-addc-4284-919c-13d6658ca6ea
+
 
 ### Pre- / Posthook and actions on stored pins
 
 You can define custom actions to be performed over all the pins in a selected
-storage entry.
+storage entry. (see demo video above)
 
 You can define pre- and posthooks for a custom action in the `storage` option table. These hooks are called before and after the stored pins are opened. You can use them to close unpinned buffers, open a new tab, or whatever you like.
 
