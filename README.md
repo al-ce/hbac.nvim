@@ -183,48 +183,66 @@ The storage picker provides the following actions:
 - `hbac_preview_stored_pins` - open a new picker to preview the selected set of stored pins. `<Esc>` will close the previewer and return to the storage picker. The results from this picker can be sent to the quickfix list or a trouble window. Default `<C-p>`
 - `hbac_update_stored_pins` - update the selected stored pins entry with the currently pinned buffers. Default `<M-u>`.
 - `hbac_add_cur_buf_to_entry` - add the current buffer to the selected storage entries. Default `<M-b>`
-- `hbac_exec_command_on_pins` - execute a command on the selected stored pins entries by selecting the command from a new picker. Default `<M-e>`
+- `hbac_exec_command_on_pins` - execute a command over all the selected stored pin entries by selecting the command from a new picker. Default `<M-e>`
 
 Note that most of these actions are exposed functions in the `hbac.storage` module and can be called directly, but the storage picker makes it easy to handle all these actions.
 
 https://github.com/al-ce/hbac.nvim/assets/23170004/17948123-2f2d-4070-89b7-334fcff656e6
 
-## Pre- / Posthook, command functions
+### Pre- / Posthook and actions on stored pins
+
+You can define custom actions to be performed over all the pins in a selected
+storage entry.
 
 You can define pre- and posthooks for a custom action in the `storage` option table. These hooks are called before and after the stored pins are opened. You can use them to close unpinned buffers, open a new tab, or whatever you like.
 
 The `command` function is called during the loop that iterates over the stored pins in an entry. It is called after the prehook and before the posthook. The default is to simply open the file and pin its buffer.
 
-Here are some minor changes to the defaults that you might find useful:
+These actions are added in your setup opts. For example:
 
 ```lua
-require("hbac").setup({
-  storage = {
-    open = {  -- override the default open command
-      prehook = function(keyname)  -- can pass the keyname of the storage entry
-        vim.cmd("Hbac close_unpinned")
-        vim.cmd("tabnew")
-      end,
-
-      command = function(pin)
-        vim.cmd("e " .. pin.abs_path)
-        local bufnr = vim.fn.bufnr()
-        require("hbac.state").pinned_buffers[bufnr] = true
-      end,
-
-      posthook = function(keyname)
-        vim.cmd("Hbac pin_picker")
-      end,
-    },
-    log_file_paths = {
-      -- note that the pre/post hooks are optional, but command is required
-      command = function(pin)
-        vim.cmd("!echo '" .. pin.abs_path .. "' >> ~/tmp/my_paths.log")
-      end,
-    },
-
-  },
-})
+      local hbac = require("hbac")
+      hbac.setup({
+        storage = {
+          -- This is the only default action, and it can be overridden
+          -- It will unpin all current buffers in the prehook, then open the
+          --files (pins) in the selected entry, then close all unpinned buffers
+          -- (i.e. all previously opened buffers that were not in the entry))
+          -- in the posthook
+          open = {
+            prehook = function()
+              hbac.unpin_all()
+            end,
+            command = function(pin)
+              vim.cmd("e " .. pin.abs_path)
+              hbac.toggle_pin()
+            end,
+            posthook = function()
+              hbac.close_unpinned()
+            end,
+          },
+          -- Unlike the default open action, this action ensures that all
+          -- currently opened files will remain open after opening the pins
+          -- by setting the autoclose_enabled flag to false in the prehook
+          append_bufs = {
+            prehook = function()
+              require("hbac.state").autoclose_enabled = false
+              -- You could also open all the pins in a new tab
+              -- vim.cmd("Hbac close_unpinned")
+            end,
+            command = function(pin)
+              vim.cmd("e " .. pin.abs_path)
+            end,
+          },
+          -- This action simply appends the paths of the pins to a log file,
+          -- without opening them
+          log_file_paths = {
+            command = function(pin)
+              vim.cmd("!echo '" .. pin.abs_path .. "' >> ~/tmp/my_paths.log")
+            end,
+          },
+        },
+      })
 ```
 
 ## Other ways to view the pin status of buffers
