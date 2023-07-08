@@ -121,6 +121,7 @@ or
 - `:Hbac pin_picker` - open the telescope picker to manage the pin states of buffers
 - `:Hbac store_pinned_bufs` - store the currently pinned bufs in a JSON file
 - `:Hbac storage_picker` - open the telescope picker to load/delete stored pins
+- `:Hbac toggle_notify` - toggle Hbac notifications on command execution
 
 or, if you prefer to use lua:
 ```lua
@@ -134,6 +135,7 @@ hbac.pin_picker()
 hbac.store_pinned_bufs()  -- no arg prompts for an entry name. Pass a string to
                           -- skip the prompt or update an existing entry
 hbac.storage_picker()
+hbac.toggle_notify()
 ```
 
 ## Telescope integration
