@@ -18,7 +18,7 @@ M.autoclose.setup = function()
 		pattern = { "*" },
 		callback = function()
 			local current_buf = vim.api.nvim_get_current_buf()
-			local buftype = vim.api.nvim_buf_get_option(current_buf, "buftype")
+			local buftype = vim.api.nvim_get_option_value("buftype", { buf = current_buf })
 			-- if the buffer is not a file - do nothing
 			if buftype ~= "" then
 				return

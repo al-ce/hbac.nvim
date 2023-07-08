@@ -17,7 +17,7 @@ end
 
 M.get_listed_buffers = function()
 	return vim.tbl_filter(function(bufnr)
-		return vim.api.nvim_buf_get_option(bufnr, "buflisted")
+		return vim.api.nvim_get_option_value("buflisted", { buf = bufnr })
 	end, vim.api.nvim_list_bufs())
 end
 
