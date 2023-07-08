@@ -1,5 +1,4 @@
 local autocommands = require("hbac.autocommands")
-local hbac_config = require("hbac.setup").opts
 local hbac_state = require("hbac.state")
 local hbac_utils = require("hbac.utils")
 local hbac_notify = require("hbac.utils").hbac_notify
@@ -17,6 +16,7 @@ M.close_unpinned = function()
 	local buflist = hbac_utils.get_listed_buffers()
 	for _, bufnr in ipairs(buflist) do
 		if hbac_utils.buf_autoclosable(bufnr) then
+			local hbac_config = require("hbac.setup").opts
 			hbac_config.close_command(bufnr)
 		end
 	end
@@ -70,6 +70,13 @@ M.storage_picker = function(opts)
 		return
 	end
 	storage_picker.storage_picker(opts)
+end
+
+M.toggle_notify = function()
+	local hbac_config = require("hbac.setup").opts
+	hbac_config.notify = not hbac_config.notify
+	local notify_state = hbac_config.notify and "enabled" or "disabled"
+	vim.notify("Notifications " .. notify_state, "info", { title = "Hbac" })
 end
 
 return M
