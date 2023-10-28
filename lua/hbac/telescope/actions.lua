@@ -1,10 +1,10 @@
-local action_state = require("telescope.actions.state")
 local hbac_actions = require("hbac.command.actions")
-local make_finder = require("hbac.telescope.make_finder")
 
 local M = {}
 
 local function execute_telescope_action(prompt_bufnr, action)
+	local action_state = require("telescope.actions.state")
+	local make_finder = require("hbac.telescope.make_finder")
 	local finder, finder_opts = make_finder.make_finder, make_finder.finder_opts
 	local picker = action_state.get_current_picker(prompt_bufnr)
 	local multi_selection = picker:get_multi_selection()
